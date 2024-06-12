@@ -28,7 +28,7 @@ class GameSpinSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         user = self.context["request"].user
-        if attrs["bet_amount"] > user.kosa_coins:
+        if attrs["bet_amount"] > user.coins:
             raise serializers.ValidationError("Insufficient kosa coins")
         return attrs
 

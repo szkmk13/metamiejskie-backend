@@ -117,6 +117,7 @@ LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 FRONTEND_URL = env("FRONTEND_URL")
 LOGIN_URL = FRONTEND_URL
+PRODUCTION_ENVIRONMENT = env.bool("PRODUCTION_ENVIRONMENT")
 # PASSWORDS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers

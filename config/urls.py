@@ -39,7 +39,7 @@ urlpatterns = [
         name="account_email_verification_sent",
     ),
     # PASSWORD RESET
-    path("api/auth/password/reset/confirm/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path("api/auth/password/reset/confirm/<id>/<key>/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
     path("api/auth/password/change/", PasswordChangeView.as_view(), name="rest_password_change"),
     path("api/auth/password/reset/", PasswordResetView.as_view(), name="rest_password_reset"),
     # TOKEN

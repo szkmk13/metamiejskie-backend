@@ -50,8 +50,8 @@ class UserAdmin(auth_admin.UserAdmin):
         #         ),
         #     },
         # ),
-        ("Trójmiejskie", {"fields": ("level", "exp", "kosa_coins", "kosa_points")}),
+        ("Trójmiejskie", {"fields": ("level", "exp", "coins", "points")}),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
-    list_display = ["username", "name", "level", "exp", "kosa_points", "kosa_coins"]
+    list_display = ["username", "name", "level", "exp", "points", "coins"]
     search_fields = ["name"]

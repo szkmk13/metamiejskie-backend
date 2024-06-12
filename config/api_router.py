@@ -8,8 +8,8 @@ from metamiejskie.users.views import UserViewSet, DailyQuestViewSet
 router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
 router.register("users", UserViewSet)
-router.register("games", GameViewSet)
-router.register("daily-quests", DailyQuestViewSet)
+router.register("casino", GameViewSet)
+router.register("quests", DailyQuestViewSet)
 
 app_name = "api"
 urlpatterns = router.urls

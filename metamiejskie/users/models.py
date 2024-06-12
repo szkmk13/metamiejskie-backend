@@ -18,8 +18,8 @@ class User(AbstractUser):
     # First and last name do not cover name patterns around the globe
     name = CharField(_("Name of User"), blank=True, max_length=255)
 
-    kosa_points = models.IntegerField(default=0)
-    kosa_coins = models.IntegerField(default=500)
+    points = models.IntegerField(default=0)
+    coins = models.IntegerField(default=500)
     exp = models.IntegerField(default=0)
     level = models.IntegerField(default=0)
 
@@ -43,10 +43,10 @@ class User(AbstractUser):
         return False
 
     def redeem_from_quest(self, daily_quest) -> None:
-        self.kosa_coins += 100
-        self.kosa_points += 10
+        self.coins += 100
+        self.points += 10
         self.exp += daily_quest.quest.duration.total_seconds() * (daily_quest.quest.level_required + 1)
-        self.save(update_fields=["kosa_coins", "kosa_points", "exp"])
+        self.save(update_fields=["coins", "points", "exp"])
         daily_quest.redeemed = True
         daily_quest.save(update_fields=["redeemed"])
 
@@ -61,8 +61,8 @@ class DailyCoins(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is None:
-            self.user.kosa_coins += 10
-            self.user.save(update_fields=["kosa_coins"])
+            self.user.coins += 10
+            self.user.save(update_fields=["coins"])
         return super().save(*args, **kwargs)
 
 

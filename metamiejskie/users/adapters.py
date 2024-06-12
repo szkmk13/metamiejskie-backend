@@ -23,9 +23,10 @@ class AccountAdapter(DefaultAccountAdapter):
             "email": email,
         }
         ctx.update(context)
-        # if backend_reset_url := ctx.get("password_reset_url"):
-        #     backend_reset_url = backend_reset_url.split("/")
-        #     ctx['password_reset_url'] = settings.FRONTEND_URL+"/"+backend_reset_url[-2]+"/"+backend_reset_url[-1]
+        if settings.PRODUCTION_ENVIRONMENT:
+            if backend_reset_url := ctx.get("password_reset_url"):
+                backend_reset_url = backend_reset_url.split("/")
+                ctx['password_reset_url'] = settings.FRONTEND_URL+"/"+backend_reset_url[-2]+"/"+backend_reset_url[-1]
         msg = self.render_mail(template_prefix, email, ctx)
         msg.send()
 
@@ -36,23 +37,24 @@ class AccountAdapter(DefaultAccountAdapter):
         confirmations are sent outside of the request context `request`
         can be `None` here.
         """
-        url = settings.FRONTEND_URL
-        # return f'{url}/?key={emailconfirmation.key}'
-        from allauth.account.internal import flows
 
+        if settings.PRODUCTION_ENVIRONMENT:
+            url = settings.FRONTEND_URL
+            return f'{url}/?key={emailconfirmation.key}'
+        from allauth.account.internal import flows
         return flows.manage_email.get_email_verification_url(request, emailconfirmation)
 
-    def get_reset_password_from_key_url(self, key):
-        """
-        Method intented to be overriden in case the password reset email
-        needs to be adjusted.
-        """
-        url = settings.FRONTEND_URL
-        # return f'{url}/?key={emailconfirmation.key}'
-        from allauth.account.internal import flows
-
-        print("UDSADSAIPASPO")
-        return flows.password_reset.get_reset_password_from_key_url(self.request, key)
+    # def get_reset_password_from_key_url(self, key):
+    #     """
+    #     Method intented to be overriden in case the password reset email
+    #     needs to be adjusted.
+    #     """
+    #     url = settings.FRONTEND_URL
+    #     # return f'{url}/?key={emailconfirmation.key}'
+    #     from allauth.account.internal import flows
+    #
+    #     print("UDSADSAIPASPO")
+    #     return flows.password_reset.get_reset_password_from_key_url(self.request, key)
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
