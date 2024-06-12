@@ -39,5 +39,5 @@ class SpinResultSerializer(serializers.Serializer):
     result = serializers.ListSerializer(child=SymbolSerializer(many=True))
 
     def to_representation(self, instance):
-        rep = self.super().to_representation(instance)
+        rep = super().to_representation(instance)
         return rep
