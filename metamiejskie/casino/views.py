@@ -30,10 +30,13 @@ class GameViewSet(ListModelMixin, GenericViewSet):
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @extend_schema(request=GameSpinSerializer, responses={200: SpinResultSerializer},summary="""Provide id of the game and play it""")
+    @extend_schema(
+        request=GameSpinSerializer,
+        responses={200: SpinResultSerializer},
+        summary="""Provide id of the game and play it""",
+    )
     @action(methods=["post"], detail=True)
     def spin(self, request, *args, **kwargs):
-
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = self.get_object()

@@ -26,7 +26,9 @@ class AccountAdapter(DefaultAccountAdapter):
         if settings.PRODUCTION_ENVIRONMENT:
             if backend_reset_url := ctx.get("password_reset_url"):
                 backend_reset_url = backend_reset_url.split("/")
-                ctx['password_reset_url'] = settings.FRONTEND_URL+"/"+backend_reset_url[-2]+"/"+backend_reset_url[-1]
+                ctx["password_reset_url"] = (
+                    settings.FRONTEND_URL + "/" + backend_reset_url[-2] + "/" + backend_reset_url[-1]
+                )
         msg = self.render_mail(template_prefix, email, ctx)
         msg.send()
 
@@ -40,8 +42,9 @@ class AccountAdapter(DefaultAccountAdapter):
 
         if settings.PRODUCTION_ENVIRONMENT:
             url = settings.FRONTEND_URL
-            return f'{url}/?key={emailconfirmation.key}'
+            return f"{url}/?key={emailconfirmation.key}"
         from allauth.account.internal import flows
+
         return flows.manage_email.get_email_verification_url(request, emailconfirmation)
 
     # def get_reset_password_from_key_url(self, key):

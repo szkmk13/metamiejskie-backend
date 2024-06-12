@@ -34,7 +34,7 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
         serializer = UserSerializer(request.user, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
-    @extend_schema(tags=['daily'],summary="Redeem daily coins")
+    @extend_schema(tags=["daily"], summary="Redeem daily coins")
     @action(detail=False, methods=["post"])
     def redeem_daily_coins(self, request):
         user = request.user
@@ -44,7 +44,8 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
         user.refresh_from_db()
         return Response(self.get_serializer(user).data, status=status.HTTP_200_OK)
 
-@extend_schema(tags=['daily'])
+
+@extend_schema(tags=["daily"])
 class DailyQuestViewSet(GenericViewSet):
     serializer_class = DailyQuestSerializer
     queryset = DailyQuest.objects.all()
@@ -56,12 +57,14 @@ class DailyQuestViewSet(GenericViewSet):
         if self.action == "start":
             return DailyQuestStartSerializer
         return DailyQuestSerializer
-    @extend_schema(request=None, responses=QuestSerializer(many=True),summary="List of possible daily quests")
+
+    @extend_schema(request=None, responses=QuestSerializer(many=True), summary="List of possible daily quests")
     @action(detail=False, methods=["get"], pagination_class=None)
     def choices(self, request):
         serializer = QuestSerializer(Quest.objects.all(), many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
-    @extend_schema(request=DailyQuestStartSerializer, responses={200: str},summary="Start a daily quest")
+
+    @extend_schema(request=DailyQuestStartSerializer, responses={200: str}, summary="Start a daily quest")
     @action(detail=False, methods=["post"])
     def start(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -69,7 +72,7 @@ class DailyQuestViewSet(GenericViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @extend_schema(request=None, responses={200: str},summary="Redeem reward from a daily quest")
+    @extend_schema(request=None, responses={200: str}, summary="Redeem reward from a daily quest")
     @action(detail=False, methods=["post"])
     def redeem(self, request):
         if request.user.tokens_redeemed():
@@ -82,5 +85,3 @@ class DailyQuestViewSet(GenericViewSet):
             return Response("Quest already started, wait for it to end", status=status.HTTP_400_BAD_REQUEST)
         request.user.redeem_from_quest(qs.first())
         return Response(status=status.HTTP_200_OK, data="Tokens redeemed")
-
-
