@@ -13,8 +13,12 @@ from rest_framework.viewsets import GenericViewSet
 from metamiejskie.users.models import User, DailyQuest, Quest, DailyCoins
 from metamiejskie.users.permissions import IsYouOrReadOnly
 
-from metamiejskie.users.serializers import UserSerializer, DailyQuestSerializer, DailyQuestStartSerializer, \
-    QuestSerializer
+from metamiejskie.users.serializers import (
+    UserSerializer,
+    DailyQuestSerializer,
+    DailyQuestStartSerializer,
+    QuestSerializer,
+)
 
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
@@ -30,7 +34,7 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
         serializer = UserSerializer(request.user, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def redeem_daily_coins(self, request):
         user = request.user
         if user.daily_coins_redeemed:
@@ -48,11 +52,12 @@ class DailyQuestViewSet(GenericViewSet):
         return DailyQuest.objects.filter(user=self.request.user)
 
     def get_serializer_class(self):
-        if self.action == 'start':
+        if self.action == "start":
             return DailyQuestStartSerializer
         return DailyQuestSerializer
+
     @extend_schema(request=DailyQuestStartSerializer, responses={200: str})
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def start(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -60,7 +65,7 @@ class DailyQuestViewSet(GenericViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @extend_schema(request=None, responses={200: str})
-    @action(detail=False, methods=['post'])
+    @action(detail=False, methods=["post"])
     def redeem(self, request):
         if request.user.tokens_redeemed():
             return Response("Tokens already redeemed", status=status.HTTP_400_BAD_REQUEST)
@@ -71,10 +76,10 @@ class DailyQuestViewSet(GenericViewSet):
         if qs.filter(will_end_at__gte=now).exists():
             return Response("Quest already started, wait for it to end", status=status.HTTP_400_BAD_REQUEST)
         request.user.redeem_from_quest(qs.first())
-        return Response(status=status.HTTP_200_OK, data='Tokens redeemed')
+        return Response(status=status.HTTP_200_OK, data="Tokens redeemed")
 
     @extend_schema(request=None, responses=QuestSerializer(many=True))
-    @action(detail=False, methods=['get'], pagination_class=None)
+    @action(detail=False, methods=["get"], pagination_class=None)
     def choices(self, request):
         serializer = QuestSerializer(Quest.objects.all(), many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)

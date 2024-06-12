@@ -19,32 +19,31 @@ from django.conf import settings
 class UserSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
-        fields = ['id', 'username', 'kosa_points', 'kosa_coins', 'exp', 'level','daily_coins_redeemed']
+        fields = ["id", "username", "kosa_points", "kosa_coins", "exp", "level", "daily_coins_redeemed"]
 
 
 class DailyQuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyQuest
-        fields = ['id', 'created_at', 'will_end_at', 'quest', 'user']
-
+        fields = ["id", "created_at", "will_end_at", "quest", "user"]
 
 
 class DailyQuestStartSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyQuest
-        fields = ["id", "created_at", "will_end_at", "redeemed", 'quest']
-        write_only_fields = ['quest']
-        read_only_fields = ['id', 'created_at', 'will_end_at','redeemed']
+        fields = ["id", "created_at", "will_end_at", "redeemed", "quest"]
+        write_only_fields = ["quest"]
+        read_only_fields = ["id", "created_at", "will_end_at", "redeemed"]
 
     def validate(self, attrs):
-        user = self.context['request'].user
+        user = self.context["request"].user
         if user.has_daily_quest():
             raise serializers.ValidationError("You already have a daily quest")
-        attrs['user'] = user
+        attrs["user"] = user
         return super().validate(attrs)
 
 
 class QuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quest
-        fields = ['id', 'title', 'description', 'duration', 'level_required']
+        fields = ["id", "title", "description", "duration", "level_required"]

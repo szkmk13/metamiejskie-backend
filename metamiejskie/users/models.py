@@ -46,9 +46,9 @@ class User(AbstractUser):
         self.kosa_coins += 100
         self.kosa_points += 10
         self.exp += daily_quest.quest.duration.total_seconds() * (daily_quest.quest.level_required + 1)
-        self.save(update_fields=['kosa_coins', 'kosa_points', 'exp'])
+        self.save(update_fields=["kosa_coins", "kosa_points", "exp"])
         daily_quest.redeemed = True
-        daily_quest.save(update_fields=['redeemed'])
+        daily_quest.save(update_fields=["redeemed"])
 
     @property
     def daily_coins_redeemed(self) -> bool:
@@ -56,13 +56,13 @@ class User(AbstractUser):
 
 
 class DailyCoins(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_coins')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="daily_coins")
     date = models.DateField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if self.id is None:
             self.user.kosa_coins += 10
-            self.user.save(update_fields=['kosa_coins'])
+            self.user.save(update_fields=["kosa_coins"])
         return super().save(*args, **kwargs)
 
 
@@ -80,8 +80,8 @@ class DailyQuest(models.Model):
     created_at = models.DateTimeField(blank=False, default=timezone.now)
     will_end_at = models.DateTimeField(blank=True)  # editable=False
     redeemed = models.BooleanField(default=False)
-    quest = models.ForeignKey(Quest, on_delete=models.CASCADE, related_name='daily_quests')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_quests')
+    quest = models.ForeignKey(Quest, on_delete=models.CASCADE, related_name="daily_quests")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="daily_quests")
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None, *args, **kwargs):
         if self.id is None:

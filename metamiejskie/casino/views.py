@@ -12,12 +12,13 @@ from metamiejskie.casino.serializers import GameSerializer, GameSpinSerializer, 
 
 # Create your views here.
 
+
 class GameViewSet(ListModelMixin, GenericViewSet):
     queryset = Game.objects.all()
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action == 'spin':
+        if self.action == "spin":
             return GameSpinSerializer
         return GameSerializer
 
@@ -25,12 +26,12 @@ class GameViewSet(ListModelMixin, GenericViewSet):
         print(self.request.user)
         return Game.objects.all()
 
-    @extend_schema(request=GameSpinSerializer,responses={200:SpinResultSerializer})
-    @action(methods=['post'], detail=True)
+    @extend_schema(request=GameSpinSerializer, responses={200: SpinResultSerializer})
+    @action(methods=["post"], detail=True)
     def spin(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         obj = self.get_object()
-        result = SpinResultSerializer(obj.run(self.request.user,serializer.validated_data['lines_chosen']))
+        result = SpinResultSerializer(obj.run(self.request.user, serializer.validated_data["lines_chosen"]))
         print(obj)
         return Response(result.data)

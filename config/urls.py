@@ -16,7 +16,8 @@ from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
-    TokenRefreshView, TokenVerifyView,
+    TokenRefreshView,
+    TokenVerifyView,
 )
 from metamiejskie.casino.views import GameViewSet
 
@@ -24,25 +25,27 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # API AUTH
     path("api/", include("config.api_router")),
-    path('api/auth/register/', RegisterView.as_view(), name='rest_register'),
+    path("api/auth/register/", RegisterView.as_view(), name="rest_register"),
     # path('api/auth/verify-email/', VerifyEmailView.as_view(), name='rest_verify_email'),
-    path('api/auth/resend-email/', ResendEmailVerificationView.as_view(), name="rest_resend_email"),
+    path("api/auth/resend-email/", ResendEmailVerificationView.as_view(), name="rest_resend_email"),
     re_path(
-        r'^api/auth/account-confirm-email/(?P<key>[-:\w]+)/$', ConfirmEmailView.as_view(),
-        name='account_confirm_email',
+        r"^api/auth/account-confirm-email/(?P<key>[-:\w]+)/$",
+        ConfirmEmailView.as_view(),
+        name="account_confirm_email",
     ),
     path(
-        'account-email-verification-sent/', TemplateView.as_view(),
-        name='account_email_verification_sent',
+        "account-email-verification-sent/",
+        TemplateView.as_view(),
+        name="account_email_verification_sent",
     ),
     # PASSWORD RESET
-    path('api/auth/password/reset/confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    path('api/auth/password/change/', PasswordChangeView.as_view(), name='rest_password_change'),
-    path('api/auth/password/reset/', PasswordResetView.as_view(), name='rest_password_reset'),
+    path("api/auth/password/reset/confirm/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path("api/auth/password/change/", PasswordChangeView.as_view(), name="rest_password_change"),
+    path("api/auth/password/reset/", PasswordResetView.as_view(), name="rest_password_reset"),
     # TOKEN
-    path('api/auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path("api/auth/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    path("api/auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # DOCS
     path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
     path(
@@ -52,7 +55,6 @@ urlpatterns = [
     ),
     # STATICS
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
-
 ]
 
 if settings.DEBUG:

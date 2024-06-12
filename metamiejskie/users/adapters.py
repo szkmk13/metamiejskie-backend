@@ -41,6 +41,7 @@ class AccountAdapter(DefaultAccountAdapter):
         from allauth.account.internal import flows
 
         return flows.manage_email.get_email_verification_url(request, emailconfirmation)
+
     def get_reset_password_from_key_url(self, key):
         """
         Method intented to be overriden in case the password reset email
@@ -49,8 +50,10 @@ class AccountAdapter(DefaultAccountAdapter):
         url = settings.FRONTEND_URL
         # return f'{url}/?key={emailconfirmation.key}'
         from allauth.account.internal import flows
-        print('UDSADSAIPASPO')
+
+        print("UDSADSAIPASPO")
         return flows.password_reset.get_reset_password_from_key_url(self.request, key)
+
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
     def is_open_for_signup(
