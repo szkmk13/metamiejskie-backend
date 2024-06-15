@@ -12,7 +12,8 @@ from metamiejskie.casino.serializers import GameSerializer, GameSpinSerializer, 
 
 # Create your views here.
 
-@extend_schema(tags=['casino WORK IN PROGRESS'])
+
+@extend_schema(tags=["casino WORK IN PROGRESS"])
 class GameViewSet(ListModelMixin, GenericViewSet):
     queryset = Game.objects.all()
     permission_classes = [IsAuthenticated]
