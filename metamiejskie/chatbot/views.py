@@ -25,7 +25,7 @@ class ChatBotViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Ge
         return ChatSerializer
 
     def get_queryset(self):
-        return Chat.objects.filter(user=self.request.user)
+        return Chat.objects.filter(user=self.request.user)  # type: ignore[misc]
 
     @action(detail=False, methods=["POST"])
     def ask(self, request, *args, **kwargs):

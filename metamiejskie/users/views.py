@@ -51,7 +51,7 @@ class DailyQuestViewSet(GenericViewSet):
     queryset = DailyQuest.objects.all()
 
     def get_queryset(self):
-        return DailyQuest.objects.filter(user=self.request.user)
+        return DailyQuest.objects.filter(user=self.request.user)  # type: ignore[misc]
 
     def get_serializer_class(self):
         if self.action == "start":
@@ -64,7 +64,9 @@ class DailyQuestViewSet(GenericViewSet):
         serializer = QuestSerializer(Quest.objects.all(), many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
-    @extend_schema(request=DailyQuestStartSerializer, responses={200: str}, summary="Start a daily quest")
+    @extend_schema(
+        request=DailyQuestStartSerializer, responses={201: DailyQuestStartSerializer}, summary="Start a daily quest"
+    )
     @action(detail=False, methods=["post"])
     def start(self, request):
         serializer = self.get_serializer(data=request.data)

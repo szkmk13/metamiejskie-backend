@@ -21,17 +21,16 @@ class User(AbstractUser):
     points = models.IntegerField(default=0)
     coins = models.IntegerField(default=500)
     exp = models.IntegerField(default=0)
-    level = models.IntegerField(default=0)
+    level = models.IntegerField(default=1)
 
     @property
-    def exp_to_next_level(self) -> float:
-        return 200 * math.sqrt(self.level + 1)
+    def exp_to_next_level(self) -> int:
+        return round(math.sqrt(self.level / 10) * 1000 + (self.level - 1) ** 2)
 
     def save(self, *args, **kwargs):
-        print(self.exp_to_next_level)
         if self.exp >= self.exp_to_next_level:
+            self.exp -= self.exp_to_next_level
             self.level += 1
-            self.exp = self.exp - self.exp_to_next_level
         super().save(*args, **kwargs)
 
     def has_daily_quest(self) -> bool:

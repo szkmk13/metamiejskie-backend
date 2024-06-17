@@ -19,7 +19,7 @@ from django.conf import settings
 class UserSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
-        fields = ["id", "username", "points", "coins", "exp", "level", "daily_coins_redeemed"]
+        fields = ["id", "username", "points", "coins", "exp", "exp_to_next_level", "level", "daily_coins_redeemed"]
 
 
 class DailyQuestSerializer(serializers.ModelSerializer):
