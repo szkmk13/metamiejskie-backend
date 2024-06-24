@@ -3,7 +3,7 @@ from django.core.validators import BaseValidator, MinLengthValidator
 from rest_framework import serializers, permissions, viewsets
 from rest_framework.exceptions import APIException
 
-from metamiejskie.meetings.models import Meeting, Attendance
+from metamiejskie.meetings.models import Meeting, Attendance, Place
 from metamiejskie.users.models import User
 
 
@@ -16,6 +16,13 @@ class DateException(APIException):
     status_code = 400
     default_detail = "error"
     default_code = ""
+
+
+class PlaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Place
+        fields = ["id", "name", "used_in_meetings"]
+        read_only_fields = ["name"]
 
 
 class AttendanceSerializer(serializers.ModelSerializer):
@@ -55,23 +62,19 @@ class MeetingAddSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class UserMeetingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username"]
+
+
 class MeetingListSerializer(serializers.ModelSerializer):
-    participants = serializers.SerializerMethodField()
-    date = serializers.SerializerMethodField()
-    confirmed = serializers.SerializerMethodField()
+    users = UserMeetingSerializer(many=True)
+    place = PlaceSerializer()
 
     class Meta:
         model = Meeting
-        fields = "__all__"
-
-    def get_participants(self, obj):
-        return [user.get_full_name() for user in obj.participants.all()]
-
-    def get_date(self, obj):
-        return obj.date
-
-    def get_confirmed(self, obj):
-        return obj.is_confirmed_by_users()
+        fields = ["id", "date", "is_confirmed_by_users", "place", "casino", "pizza", "users"]
 
 
 class ParticipantSerializer(serializers.ModelSerializer):

@@ -8,6 +8,20 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
+class VariablesManager(models.Manager):
+    def DAILY_COINS(self):
+        return self.filter(name="DAILY_COINS").first().value
+
+    def by_name(self, name):
+        return self.filter(name=name).first().value
+
+
+class Variables(models.Model):
+    name = models.CharField(max_length=50)
+    value = models.FloatField()
+    objects = VariablesManager()
+
+
 class User(AbstractUser):
     """
     Default custom user model for metamiejskie.
@@ -42,12 +56,18 @@ class User(AbstractUser):
         return False
 
     def redeem_from_quest(self, daily_quest) -> None:
-        self.coins += 100
-        self.points += 10
+        self.coins += Variables.objects.by_name("daily_quest_coins")
+        self.points += Variables.objects.by_name("daily_quest_points")
         self.exp += daily_quest.quest.duration.total_seconds() * (daily_quest.quest.level_required + 1)
         self.save(update_fields=["coins", "points", "exp"])
         daily_quest.redeemed = True
         daily_quest.save(update_fields=["redeemed"])
+
+    def redeem_from_attendance(self):
+        self.coins += 2
+        self.points += 3
+        self.exp += 4
+        self.save(update_fields=["coins", "points", "exp"])
 
     @property
     def daily_coins_redeemed(self) -> bool:
@@ -57,11 +77,14 @@ class User(AbstractUser):
 class DailyCoins(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="daily_coins")
     date = models.DateField(auto_now_add=True)
+    amount = models.FloatField(default=0)
 
     def save(self, *args, **kwargs):
         if self.id is None:
-            self.user.coins += 10
+            daily_coins = Variables.objects.DAILY_COINS()
+            self.user.coins += daily_coins
             self.user.save(update_fields=["coins"])
+            self.amount = daily_coins
         return super().save(*args, **kwargs)
 
 

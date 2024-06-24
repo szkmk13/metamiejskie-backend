@@ -107,5 +107,3 @@ class BetAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [re_path("bet_completion/", self.bet_completion)]
         return custom_urls + urls
-
-

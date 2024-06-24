@@ -76,7 +76,7 @@ class DailyQuestViewSet(GenericViewSet):
     @action(detail=False, methods=["post"])
     def redeem(self, request):
         if request.user.tokens_redeemed():
-            return Response("Tokens already redeemed", status=status.HTTP_400_BAD_REQUEST)
+            return Response("Rewards already redeemed", status=status.HTTP_400_BAD_REQUEST)
         now = timezone.now()
         qs = self.get_queryset().filter(created_at__date=now)
         if qs.count() == 0:
@@ -84,4 +84,4 @@ class DailyQuestViewSet(GenericViewSet):
         if qs.filter(will_end_at__gte=now).exists():
             return Response("Quest already started, wait for it to end", status=status.HTTP_400_BAD_REQUEST)
         request.user.redeem_from_quest(qs.first())
-        return Response(status=status.HTTP_200_OK, data="Tokens redeemed")
+        return Response(status=status.HTTP_200_OK, data="Rewards redeemed")

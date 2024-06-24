@@ -1,31 +1,37 @@
 import datetime
 
 from django.db import models
-from django.db.models import Model, DateTimeField
+from django.db.models import Model, DateTimeField, Sum
 from django.utils import timezone
 
 from metamiejskie.users.models import User
 
 
-class Meeting(models.Model):
-    def save(self, *args, **kwargs):
-        if self.place != "OTHER":
-            self.other_place = None
-        super(Meeting, self).save(*args, **kwargs)
+class Place(models.Model):
+    name = models.CharField(max_length=100)
 
-    MIN_ATTENDANCE = 3
-    date = models.DateField()
-    participants = models.ManyToManyField(User, through="Attendance")
-    place = models.CharField(max_length=30)
-    other_place = models.CharField(max_length=30, blank=True, null=True)
-    pizza = models.BooleanField(default=False)
-    kasyno = models.BooleanField(default=False)
+    @property
+    def used_in_meetings(self) -> int:
+        return self.meeting_set.count()
 
-    # who_paid = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     def __str__(self):
-        names = [user.get_full_name() for user in self.participants.all()]
-        return f"{self.other_place} of {names}" if self.other_place else f"Meeting at {self.place} of {names}"
+        return self.name
 
+
+class Meeting(models.Model):
+    MIN_ATTENDANCE = 3
+
+    date = models.DateField()
+    users = models.ManyToManyField(User, through="Attendance")
+    place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True)
+
+    pizza = models.BooleanField(default=False)
+    casino = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.date) + self.place.name
+
+    @property
     def is_confirmed_by_users(self):
         attendances = self.attendance_set.all()
         confirmed_count = attendances.filter(confirmed=True).count()
@@ -39,19 +45,15 @@ class Meeting(models.Model):
 
     @property
     def how_many_attended(self):
-        return self.participants.count()
+        return self.users.count()
 
     @property
     def confirmed_by_less_than_2_users(self):
-        confirmed = 0
-        attendances = self.attendance_set.all()
-        for _ in attendances:
-            if _.confirmed:
-                confirmed += 1
-        return confirmed < 2
+        confirmed_count = self.attendance_set.filter(confirmed=True).count()
+        return confirmed_count < 2
 
     def confirmed_by_user(self, user):
-        if user in self.participants.all():
+        if user in self.users.all():
             return self.attendance_set.get(user=user).confirmed
         return False
 

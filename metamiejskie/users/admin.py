@@ -6,7 +6,12 @@ from django.utils.translation import gettext_lazy as _
 
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
-from .models import User, Quest, DailyQuest, DailyCoins
+from .models import User, Quest, DailyQuest, DailyCoins, Variables
+
+
+@admin.register(Variables)
+class VariablesAdmin(admin.ModelAdmin):
+    list_display = ("name", "value")
 
 
 @admin.register(Quest)
@@ -16,7 +21,7 @@ class QuestAdmin(admin.ModelAdmin):
 
 @admin.register(DailyCoins)
 class DailyCoinsAdmin(admin.ModelAdmin):
-    list_display = ("date", "user")
+    list_display = ("date", "user", "amount")
     list_filter = ("date", "user")
 
 
