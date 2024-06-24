@@ -14,4 +14,5 @@ router.register("quests", DailyQuestViewSet)
 router.register("chatbot", ChatBotViewSet)
 
 app_name = "api"
-urlpatterns = router.urls
+
+urlpatterns = [*router.urls]

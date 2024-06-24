@@ -1,17 +1,15 @@
 from django.utils import timezone
-from django.views.generic.base import RedirectView
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.mixins import ListModelMixin, CreateModelMixin
+from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
-from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from metamiejskie.users.models import User, DailyQuest, Quest, DailyCoins
-from metamiejskie.users.permissions import IsYouOrReadOnly
+from metamiejskie.permissions import IsYouOrReadOnly
 
 from metamiejskie.users.serializers import (
     UserSerializer,

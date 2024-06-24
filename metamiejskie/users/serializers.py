@@ -29,11 +29,16 @@ class DailyQuestSerializer(serializers.ModelSerializer):
 
 
 class DailyQuestStartSerializer(serializers.ModelSerializer):
+    time = serializers.SerializerMethodField()
+
     class Meta:
         model = DailyQuest
-        fields = ["id", "created_at", "will_end_at", "redeemed", "quest"]
+        fields = ["id", "created_at", "will_end_at", "redeemed", "quest", "time"]
         write_only_fields = ["quest"]
-        read_only_fields = ["id", "created_at", "will_end_at", "redeemed"]
+        read_only_fields = ["id", "created_at", "will_end_at", "redeemed", "time"]
+
+    def get_time(self, obj) -> int:
+        return obj.quest.duration.total_seconds()
 
     def validate(self, attrs):
         user = self.context["request"].user

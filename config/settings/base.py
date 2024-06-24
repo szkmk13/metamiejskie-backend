@@ -94,9 +94,9 @@ LOCAL_APPS = [
     "metamiejskie.users",
     "metamiejskie.casino",
     "metamiejskie.chatbot",
-    # "metamiejskie.meetings",
-    # "metamiejskie.bingo",
-    # "metamiejskie.bets",
+    "metamiejskie.meetings",
+    "metamiejskie.bingo",
+    "metamiejskie.bets",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
