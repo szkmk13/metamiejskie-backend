@@ -9,7 +9,6 @@ from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.models import AbstractBaseUser, update_last_login
 from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.settings import api_settings
 
 from metamiejskie.users.models import User, DailyQuest, Quest
@@ -56,9 +55,9 @@ class DailyQuestStartSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         user = self.context["request"].user
         if user.level < attrs["quest"].level_required:
-            raise serializers.ValidationError("Hit level first")
+            raise DetailException("Hit level first")
         if user.has_daily_quest():
-            raise serializers.ValidationError("You already have a daily quest")
+            raise DetailException("You already have a daily quest")
         attrs["user"] = user
         return super().validate(attrs)
 

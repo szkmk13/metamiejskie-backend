@@ -2,6 +2,7 @@ from rest_framework.serializers import *
 from django.core.validators import MinValueValidator
 
 from metamiejskie.casino.models import Game, Symbol
+from metamiejskie.utils import DetailException
 
 
 class SymbolSerializer(ModelSerializer):
@@ -29,7 +30,7 @@ class GameSpinSerializer(ModelSerializer):
     def validate(self, attrs):
         user = self.context["request"].user
         if attrs["bet_amount"] > user.coins:
-            raise ValidationError("Insufficient coins")
+            raise DetailException("Insufficient coins")
         return attrs
 
 

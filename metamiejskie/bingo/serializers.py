@@ -3,6 +3,7 @@ import json
 from rest_framework import serializers
 
 from metamiejskie.bingo.models import Bingo, BingoField
+from metamiejskie.utils import DetailException
 
 
 class BingoSerializer(serializers.ModelSerializer):
@@ -18,7 +19,7 @@ class BingoChangeFieldSerializer(serializers.Serializer):
         field_name = attrs.get("field_name")
         field_name = field_name.lower()
         if field_name not in BingoField.objects.values_list("name", flat=True):
-            raise serializers.ValidationError("Field name is not valid")
+            raise DetailException("Field name is not valid")
         if self.context["bingo"].check_field(field_name):
-            raise serializers.ValidationError("You got this field already")
+            raise DetailException("You got this field already")
         return attrs

@@ -6,6 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import re_path
 from metamiejskie.bets.models import Bet, Vote
+from metamiejskie.utils import DetailException
 
 
 @admin.register(Vote)
@@ -23,9 +24,9 @@ class BetCompletionForm(forms.Form):
         session = cleaned_data.get("no")
 
         if track and session:
-            self.add_error("yes", forms.ValidationError("Tak lub nie"))
+            self.add_error("yes", DetailException("Tak lub nie"))
         if not track and not session:
-            self.add_error("yes", forms.ValidationError("Wybierz"))
+            self.add_error("yes", DetailException("Wybierz"))
         return cleaned_data
 
 

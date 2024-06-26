@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.core.validators import BaseValidator, MinLengthValidator
 from django.utils import timezone
 from rest_framework import serializers, permissions, viewsets
@@ -6,17 +5,8 @@ from rest_framework.exceptions import APIException
 
 from metamiejskie.meetings.models import Meeting, Attendance, Place
 from metamiejskie.users.models import User
+from metamiejskie.utils import DetailException
 
-
-class TrojmiejskiException(APIException):
-    status_code = 400
-    default_detail = f"Żeby spotkanie się liczyło musi na nim być conajmniej {Meeting.MIN_ATTENDANCE} trójmiejskich"
-
-
-class DateException(APIException):
-    status_code = 400
-    default_detail = "error"
-    default_code = ""
 
 
 class PlaceSerializer(serializers.ModelSerializer):
@@ -94,7 +84,7 @@ class MeetingAddSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         attrs = super().validate(attrs)
         if len(attrs["participants"]) < Meeting.MIN_ATTENDANCE:
-            raise serializers.ValidationError("There must be at least 3 participants.")
+            raise DetailException("There must be at least 3 participants.")
         place_string = attrs.pop("place_name").strip().replace("_", " ").replace("-", " ")
         place = Place.objects.filter(name__iexact=place_string).first()
         if place:
