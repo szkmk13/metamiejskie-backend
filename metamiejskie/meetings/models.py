@@ -29,10 +29,10 @@ class Meeting(models.Model):
     casino = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.date) + self.place.name
+        return f"{self.date} {self.place.name}"
 
     @property
-    def is_confirmed_by_users(self):
+    def is_confirmed_by_users(self) -> bool:
         attendances = self.attendance_set.all()
         confirmed_count = attendances.filter(confirmed=True).count()
         if confirmed_count > 1:
@@ -40,15 +40,15 @@ class Meeting(models.Model):
         return False
 
     @staticmethod
-    def count_attendance(user):
-        return Attendance.objects.filter(user=user)
+    def count_attendance(user) -> int:
+        return Attendance.objects.filter(user=user).count()
 
     @property
-    def how_many_attended(self):
+    def how_many_attended(self) -> int:
         return self.users.count()
 
     @property
-    def confirmed_by_less_than_2_users(self):
+    def confirmed_by_less_than_2_users(self) -> bool:
         confirmed_count = self.attendance_set.filter(confirmed=True).count()
         return confirmed_count < 2
 

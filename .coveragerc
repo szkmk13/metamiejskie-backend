@@ -5,4 +5,5 @@ omit =
     */__init__.py
     */apps.py
     */tests/*
+    */tests.py
     */context_processors.py

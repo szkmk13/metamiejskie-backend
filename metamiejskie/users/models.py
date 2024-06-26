@@ -56,9 +56,10 @@ class User(AbstractUser):
         return False
 
     def redeem_from_quest(self, daily_quest) -> None:
-        self.coins += Variables.objects.by_name("daily_quest_coins")
-        self.points += Variables.objects.by_name("daily_quest_points")
-        self.exp += daily_quest.quest.duration.total_seconds() * (daily_quest.quest.level_required + 1)
+        self.coins += daily_quest.quest.coins
+        self.points += daily_quest.quest.points
+        self.exp += daily_quest.quest.exp
+
         self.save(update_fields=["coins", "points", "exp"])
         daily_quest.redeemed = True
         daily_quest.save(update_fields=["redeemed"])
@@ -81,7 +82,7 @@ class DailyCoins(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id is None:
-            daily_coins = Variables.objects.DAILY_COINS()
+            daily_coins = 50
             self.user.coins += daily_coins
             self.user.save(update_fields=["coins"])
             self.amount = daily_coins
@@ -92,7 +93,12 @@ class Quest(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.DurationField(default=0, help_text="in seconds")
+
     level_required = models.IntegerField(default=0)
+
+    coins = models.IntegerField(default=150)
+    points = models.IntegerField(default=10)
+    exp = models.IntegerField(default=100)
 
     def __str__(self):
         return f"{self.duration.total_seconds() / 60} min {self.title}"

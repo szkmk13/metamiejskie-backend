@@ -42,6 +42,8 @@ class DailyQuestStartSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         user = self.context["request"].user
+        if user.level < attrs["quest"].level_required:
+            raise serializers.ValidationError("Hit level first")
         if user.has_daily_quest():
             raise serializers.ValidationError("You already have a daily quest")
         attrs["user"] = user
@@ -49,6 +51,12 @@ class DailyQuestStartSerializer(serializers.ModelSerializer):
 
 
 class QuestSerializer(serializers.ModelSerializer):
+    can_start = serializers.SerializerMethodField()
+
+    def get_can_start(self, obj) -> bool:
+        user = self.context["request"].user
+        return user.level >= obj.level_required
+
     class Meta:
         model = Quest
-        fields = ["id", "title", "description", "duration", "level_required"]
+        fields = ["id", "title", "description", "duration", "level_required", "can_start"]

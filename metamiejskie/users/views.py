@@ -59,7 +59,7 @@ class DailyQuestViewSet(GenericViewSet):
     @extend_schema(request=None, responses=QuestSerializer(many=True), summary="List of possible daily quests")
     @action(detail=False, methods=["get"], pagination_class=None)
     def choices(self, request):
-        serializer = QuestSerializer(Quest.objects.all(), many=True)
+        serializer = QuestSerializer(Quest.objects.all(), many=True, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
     @extend_schema(

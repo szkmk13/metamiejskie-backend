@@ -5,10 +5,12 @@ from django.utils import timezone
 from rest_framework.test import APITestCase, APIClient
 
 from metamiejskie.users.tests.factories import UserFactory, QuestFactory, DailyQuestFactory
+from metamiejskie.utils import variables_setup
 
 
 class TestUserViewSet(APITestCase):
     def setUp(self):
+        variables_setup()
         self.client = APIClient()
         self.user = UserFactory()
         self.client.force_authenticate(user=self.user)
@@ -38,7 +40,7 @@ class TestUserViewSet(APITestCase):
         response = self.client.post("/api/users/redeem_daily_coins/")
         self.assertEqual(response.status_code, 200)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.coins, coins_before + 10)
+        self.assertEqual(self.user.coins, coins_before + 50)
 
     def test_claim_daily_coins_redeem_second_time(self):
         response = self.client.post("/api/users/redeem_daily_coins/")
@@ -49,6 +51,7 @@ class TestUserViewSet(APITestCase):
 
 class TestDailyQuestViewSet(APITestCase):
     def setUp(self):
+        variables_setup()
         self.client = APIClient()
         self.user = UserFactory()
         self.quest = QuestFactory(duration=timedelta(minutes=1))
