@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from dj_rest_auth.serializers import PasswordResetSerializer
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, PasswordField
@@ -14,6 +15,18 @@ from rest_framework_simplejwt.settings import api_settings
 from metamiejskie.users.models import User, DailyQuest, Quest
 
 from django.conf import settings
+
+from metamiejskie.utils import DetailException
+
+
+class CustomLoginSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        email = EmailAddress.objects.filter(user__username=attrs["username"]).first()
+        if not email:
+            raise DetailException("Email not found")
+        if not email.verified:
+            raise DetailException("Email is not verified")
+        return super().validate(attrs)
 
 
 class UserSerializer(serializers.ModelSerializer[User]):

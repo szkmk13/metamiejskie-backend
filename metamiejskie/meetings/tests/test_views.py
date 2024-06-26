@@ -18,9 +18,11 @@ class TestMeetingsViewset(APITestCase):
     def test_places(self):
         response = self.client.get("/api/meetings/places/")
         self.assertEqual(len(response.data), 1)
+
     def test_meetings_list_no_meetings(self):
         response = self.client.get("/api/meetings/")
         self.assertEqual(len(response.data), 0)
+
     def test_meetings_list_1_confirmed_meeting(self):
         response = self.client.get("/api/meetings/")
         self.assertEqual(len(response.data), 0)

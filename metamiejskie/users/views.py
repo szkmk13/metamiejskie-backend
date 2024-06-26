@@ -1,4 +1,3 @@
-from allauth.account.views import ConfirmEmailView
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -47,7 +46,8 @@ class MetamiejskieConfirmEmailView(GenericAPIView):
         user = confirmation.email_address.user
         user.is_active = True
         user.save()
-        return Response("ok")
+        # return Response("ok")
+        return Response({"detail": "Email confirmed"})
 
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):

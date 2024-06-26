@@ -304,6 +304,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "TOKEN_OBTAIN_SERIALIZER": "metamiejskie.users.serializers.CustomLoginSerializer",
 }
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
