@@ -24,6 +24,7 @@ class Meeting(models.Model):
     date = models.DateField()
     users = models.ManyToManyField(User, through="Attendance")
     place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True)
+    confirmed_by_majority = models.BooleanField(default=False)
 
     pizza = models.BooleanField(default=False)
     casino = models.BooleanField(default=False)
@@ -32,25 +33,27 @@ class Meeting(models.Model):
         return f"{self.date} {self.place.name}"
 
     @property
-    def is_confirmed_by_users(self) -> bool:
-        attendances = self.attendance_set.all()
-        confirmed_count = attendances.filter(confirmed=True).count()
-        if confirmed_count > 1:
-            return True
-        return False
-
-    @staticmethod
-    def count_attendance(user) -> int:
-        return Attendance.objects.filter(user=user).count()
-
-    @property
-    def how_many_attended(self) -> int:
+    def count_attended(self) -> int:
         return self.users.count()
 
     @property
-    def confirmed_by_less_than_2_users(self) -> bool:
-        confirmed_count = self.attendance_set.filter(confirmed=True).count()
-        return confirmed_count < 2
+    def count_confirmed(self) -> int:
+        return self.attendance_set.filter(confirmed=True).count()
+
+    @property
+    def majority_threshold(self) -> int:
+        return round(self.count_attended / 2)
+
+    @property
+    def confirmed_by_less_half_users(self) -> bool:
+        return self.count_confirmed < self.majority_threshold
+
+    def rewards_based_on_size_of_meeting(self) -> dict:
+        return {
+            "coins": 100 * (1 + (self.count_attended - self.MIN_ATTENDANCE) / 2),
+            "points": 50 * (1 + (self.count_attended - self.MIN_ATTENDANCE) / 2),
+            "exp": 100 * (1 + (self.count_attended - self.MIN_ATTENDANCE)),
+        }
 
     def confirmed_by_user(self, user):
         if user in self.users.all():

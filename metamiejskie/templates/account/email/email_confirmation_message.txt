@@ -2,6 +2,15 @@
 {% load account %}
 {% load i18n %}
 
-{% block content %}{% autoescape off %}{% user_display user as user_display %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}You're receiving this email because user {{ user_display }} has given your email address to register an account on {{ site_domain }}.
+{% block content %}{% autoescape off %}{% user_display user as user_display %}
+Dostajesz tego maila ponieważ KTOŚ próbuje założyć konto na portalu <b>metamiejskie</b> podając taki login: {{ user_display }}
 
-To confirm this is correct, go to {{ activate_url }}{% endblocktrans %}{% endautoescape %}{% endblock content %}
+Jeżeli to nie byłeś ty SKASUJ TEGO MAILA!
+Poważnie, bezpieczeństwo w sieci to nie przelewki.
+
+Ostrzegałem...
+
+Żeby potwierdzić swoje konto i przejść do portalu kliknij w link poniżej
+{{ activate_url }}
+{% endautoescape %}
+{% endblock content %}

@@ -87,6 +87,7 @@ class MeetingAddSerializer(serializers.ModelSerializer):
             attendance = Attendance(meeting=meeting, user=user, drinking=drinking)
             if self.context["request"].user == user:
                 attendance.confirmed = True
+                user.redeem_from_attendance()
             attendance.save()
         return meeting
 
@@ -114,4 +115,4 @@ class MeetingListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ["id", "date", "is_confirmed_by_users", "place", "casino", "pizza", "users"]
+        fields = ["id", "date", "confirmed_by_majority", "place", "casino", "pizza", "users"]
