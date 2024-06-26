@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest import TestCase
 
 from django.utils import timezone
 from rest_framework.test import APITestCase, APIClient
@@ -7,12 +8,10 @@ from metamiejskie.users.tests.factories import UserFactory, QuestFactory, DailyQ
 from metamiejskie.utils import variables_setup
 
 
-class TestUserViewSet(APITestCase):
+class TestUserModel(APITestCase):
     def setUp(self):
         variables_setup()
-        self.client = APIClient()
         self.user = UserFactory()
-        self.client.force_authenticate(user=self.user)
 
     def test_quest_string(self):
         quest = QuestFactory()
@@ -43,3 +42,9 @@ class TestUserViewSet(APITestCase):
         self.assertEqual(self.user.points, 10)
         self.assertEqual(self.user.coins, 650)
         self.assertEqual(daily.redeemed, True)
+
+    def test_user_redeem_from_attendance(self):
+        coins = self.user.coins
+        self.user.redeem_from_attendance()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.coins, coins + 15)

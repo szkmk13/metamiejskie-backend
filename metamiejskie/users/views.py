@@ -1,10 +1,13 @@
+from allauth.account.views import ConfirmEmailView
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.generics import GenericAPIView
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.mixins import UpdateModelMixin
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
@@ -17,6 +20,34 @@ from metamiejskie.users.serializers import (
     DailyQuestStartSerializer,
     QuestSerializer,
 )
+
+from django.http import Http404
+
+from allauth.account.models import (
+    get_emailconfirmation_model,
+)
+
+
+class MetamiejskieConfirmEmailView(GenericAPIView):
+    permission_classes = [AllowAny]
+
+    def get_object(self, queryset=None):
+        key = self.kwargs["key"]
+        model = get_emailconfirmation_model()
+        emailconfirmation = model.from_key(key)
+        if not emailconfirmation:
+            raise Http404()
+        return emailconfirmation
+
+    def post(self, *args, **kwargs):
+        self.object = confirmation = self.get_object()
+        email_address = confirmation.confirm(self.request)
+        if not email_address:
+            return Response("Email does not exist", status=404)
+        user = confirmation.email_address.user
+        user.is_active = True
+        user.save()
+        return Response("ok")
 
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):

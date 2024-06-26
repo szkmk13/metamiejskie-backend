@@ -64,3 +64,8 @@ class TestMeetingModels(APITestCase):
         meeting = MeetingFactory()
         AttendanceFactory(user=self.user, meeting=meeting, confirmed=True)
         self.assertEqual(meeting.confirmed_by_user(self.user), True)
+
+    def test_meeting_confirmed_by_user_not_in_meeting_false(self):
+        meeting = MeetingFactory()
+        AttendanceFactory(meeting=meeting, confirmed=True)
+        self.assertEqual(meeting.confirmed_by_user(self.user), False)

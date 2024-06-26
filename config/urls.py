@@ -20,6 +20,7 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 from metamiejskie.casino.views import GameViewSet
+from metamiejskie.users.views import MetamiejskieConfirmEmailView
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
@@ -28,9 +29,9 @@ urlpatterns = [
     path("api/auth/register/", RegisterView.as_view(), name="rest_register"),
     # path('api/auth/verify-email/', VerifyEmailView.as_view(), name='rest_verify_email'),
     path("api/auth/resend-email/", ResendEmailVerificationView.as_view(), name="rest_resend_email"),
-    re_path(
-        r"^api/auth/account-confirm-email/(?P<key>[-:\w]+)/$",
-        ConfirmEmailView.as_view(),
+    path(
+        "api/auth/account-confirm-email/<key>/",
+        MetamiejskieConfirmEmailView.as_view(),
         name="account_confirm_email",
     ),
     path(

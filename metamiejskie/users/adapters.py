@@ -10,7 +10,6 @@ from django.contrib.sites.shortcuts import get_current_site
 if typing.TYPE_CHECKING:
     from allauth.socialaccount.models import SocialLogin
     from django.http import HttpRequest
-
     from metamiejskie.users.models import User
 
 
@@ -19,9 +18,7 @@ class AccountAdapter(DefaultAccountAdapter):
         return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
 
     def send_mail(self, template_prefix, email, context):
-        ctx = {
-            "email": email,
-        }
+        ctx = {"email": email}
         ctx.update(context)
         if settings.PRODUCTION_ENVIRONMENT:
             if backend_reset_url := ctx.get("password_reset_url"):
@@ -42,22 +39,10 @@ class AccountAdapter(DefaultAccountAdapter):
 
         if settings.PRODUCTION_ENVIRONMENT:
             url = settings.FRONTEND_URL
-            return f"{url}/?key={emailconfirmation.key}"
+            return f"{url}/confirm-email/?key={emailconfirmation.key}"
         from allauth.account.internal import flows
 
         return flows.manage_email.get_email_verification_url(request, emailconfirmation)
-
-    # def get_reset_password_from_key_url(self, key):
-    #     """
-    #     Method intented to be overriden in case the password reset email
-    #     needs to be adjusted.
-    #     """
-    #     url = settings.FRONTEND_URL
-    #     # return f'{url}/?key={emailconfirmation.key}'
-    #     from allauth.account.internal import flows
-    #
-    #     print("UDSADSAIPASPO")
-    #     return flows.password_reset.get_reset_password_from_key_url(self.request, key)
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):

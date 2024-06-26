@@ -65,10 +65,8 @@ class User(AbstractUser):
         daily_quest.save(update_fields=["redeemed"])
 
     def redeem_from_attendance(self):
-        self.coins += 2
-        self.points += 3
-        self.exp += 4
-        self.save(update_fields=["coins", "points", "exp"])
+        self.coins += 15
+        self.save(update_fields=["coins"])
 
     @property
     def daily_coins_redeemed(self) -> bool:
