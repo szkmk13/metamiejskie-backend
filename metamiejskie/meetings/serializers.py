@@ -8,7 +8,6 @@ from metamiejskie.users.models import User
 from metamiejskie.utils import DetailException
 
 
-
 class PlaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Place

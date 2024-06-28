@@ -8,6 +8,33 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
+class PatchNotes(models.Model):
+    date = models.DateField(unique=True)
+    text = models.TextField(help_text="You can use markdown here")
+    version = models.CharField(max_length=40, blank=True)
+    major = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name_plural = "Patch Notes"
+
+    def save(self, *args, **kwargs):
+        last_version = PatchNotes.objects.order_by("-date").first()
+        if not last_version:
+            return super().save(*args, **kwargs)
+        if self.id is None:
+            last_version = last_version.version
+            major_number, minor_number = last_version.split(".")
+            this_major = int(major_number)
+            this_minor = int(minor_number)
+            if self.major:
+                this_major += 1
+                this_minor = 0
+            else:
+                this_minor += 1
+            self.version = f"{this_major}.{this_minor}"
+            return super().save(*args, **kwargs)
+
+
 class VariablesManager(models.Manager):
     def DAILY_COINS(self):
         return self.filter(name="DAILY_COINS").first().value

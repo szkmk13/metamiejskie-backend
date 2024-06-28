@@ -12,9 +12,14 @@ class AttendanceInline(admin.TabularInline):
 
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "date")
-
+    list_display = ("__str__", "date", "confirmed_by_majority")
+    list_filter = ("confirmed_by_majority", "date")
     inlines = [AttendanceInline]
+    actions = ["confirm"]
+
+    def confirm(self, request, queryset):
+        queryset.update(confirmed_by_majority=True)
+        return
 
 
 @admin.register(Attendance)

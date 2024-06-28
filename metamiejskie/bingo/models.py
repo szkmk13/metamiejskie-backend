@@ -7,6 +7,8 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 
+from metamiejskie.users.models import User
+
 
 class BingoField(models.Model):
     """Used only for dynamic setting of a possible bingo fields"""
@@ -56,9 +58,7 @@ class Bingo(models.Model):
 
     def _check_win_condition(self):
         order = self.order
-        print(order.values())
         current_values = [bingo_field["completed"] for bingo_field in order.values()]
-        print(current_values)
         possible_wins = [
             [0, 1, 2, 3, 4],
             [5, 6, 7, 8, 9],
@@ -80,7 +80,7 @@ class Bingo(models.Model):
             return True
         return False
 
-    def mark_field_as_done(self, field_name: str):
+    def change_field(self, field_name: str):
         order = self.order
         order[field_name]["completed"] = True
         self.card["order"] = order
@@ -97,13 +97,8 @@ class Bingo(models.Model):
 class BingoEntry(models.Model):
     """Used to statistics"""
 
-    date = models.DateField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    bingo = models.ForeignKey(Bingo, on_delete=models.CASCADE)
+    bingo_field = models.ForeignKey(BingoField, on_delete=models.CASCADE)
+
     marked = models.BooleanField(default=False)
-    bingo = models.ForeignKey(
-        Bingo,
-        on_delete=models.CASCADE,
-    )
-    bingo_field = models.ForeignKey(
-        BingoField,
-        on_delete=models.CASCADE,
-    )

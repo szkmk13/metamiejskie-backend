@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
 from rest_framework_simplejwt.settings import api_settings
 
-from metamiejskie.users.models import User, DailyQuest, Quest
+from metamiejskie.users.models import User, DailyQuest, Quest, PatchNotes
 
 from django.conf import settings
 
@@ -72,3 +72,9 @@ class QuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quest
         fields = ["id", "title", "description", "duration", "level_required", "can_start"]
+
+
+class PatchNotesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PatchNotes
+        fields = ["id", "date", "version", "text"]

@@ -6,7 +6,13 @@ from django.utils.translation import gettext_lazy as _
 
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
-from .models import User, Quest, DailyQuest, DailyCoins, Variables
+from .models import User, Quest, DailyQuest, DailyCoins, Variables, PatchNotes
+
+
+@admin.register(PatchNotes)
+class PatchNotesAdmin(admin.ModelAdmin):
+    list_display = ("version", "date", "text")
+    list_filter = ("date",)
 
 
 @admin.register(Variables)

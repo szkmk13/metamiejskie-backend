@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from metamiejskie.users.models import User, DailyQuest, Quest, DailyCoins
+from metamiejskie.users.models import User, DailyQuest, Quest, DailyCoins, PatchNotes
 from metamiejskie.permissions import IsYouOrReadOnly
 
 from metamiejskie.users.serializers import (
@@ -18,6 +18,7 @@ from metamiejskie.users.serializers import (
     DailyQuestSerializer,
     DailyQuestStartSerializer,
     QuestSerializer,
+    PatchNotesSerializer,
 )
 
 from django.http import Http404
@@ -48,6 +49,13 @@ class MetamiejskieConfirmEmailView(GenericAPIView):
         user.save()
         # return Response("ok")
         return Response({"detail": "Email confirmed"})
+
+
+@extend_schema(tags=["patch notes"])
+class PatchNotesView(ListModelMixin, GenericViewSet):
+    permission_classes = [AllowAny]
+    queryset = PatchNotes.objects.order_by("-date")
+    serializer_class = PatchNotesSerializer
 
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):

@@ -13,7 +13,6 @@ from metamiejskie.bingo.serializers import BingoSerializer, BingoChangeFieldSeri
 
 class BingoViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     queryset = Bingo.objects.all()
-    permission_classes = [AllowAny]
     serializer_classes = {
         "list": BingoSerializer,
         "mark_field_as_done": BingoChangeFieldSerializer,
@@ -24,12 +23,12 @@ class BingoViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     @extend_schema(request=BingoChangeFieldSerializer, responses={200: BingoSerializer})
     @action(methods=["post"], detail=True)
-    def mark_field_as_done(self, request, *args, **kwargs):
+    def change_field(self, request, *args, **kwargs):
         bingo = self.get_object()
         serializer = self.get_serializer(data=request.data, context={"bingo": bingo})
         serializer.is_valid(raise_exception=True)
         field_name = serializer.validated_data["field_name"]
-        bingo.mark_field_as_done(field_name=field_name)
+        bingo.change_field(field_name=field_name)
         BingoEntry.objects.create(
             bingo=bingo, date=bingo.date, bingo_field=BingoField.objects.get(name=field_name), marked=True
         )

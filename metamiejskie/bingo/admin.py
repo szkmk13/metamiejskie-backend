@@ -16,5 +16,8 @@ class BingoFieldAdmin(admin.ModelAdmin):
 
 @admin.register(BingoEntry)
 class BingoEntryAdmin(admin.ModelAdmin):
-    list_display = ("date", "bingo", "marked")
-    list_filter = ("date", "bingo")
+    list_display = ("user", "date", "bingo", "marked")
+    list_filter = ("bingo", "user")
+
+    def date(self, obj):
+        return obj.bingo.date
