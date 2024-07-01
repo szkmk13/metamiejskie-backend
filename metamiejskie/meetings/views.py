@@ -11,21 +11,24 @@ from metamiejskie.meetings.serializers import (
     MeetingListSerializer,
     MeetingAddSerializer,
     PlaceSerializer,
+    MeetingDetailSerializer,
+    ConfirmMeetingListSerializer,
 )
 
 
 @extend_schema(summary="Meetings view", tags=["meetings"])
-class MeetingViewSet(
-    viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.CreateModelMixin
-):
+class MeetingViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.CreateModelMixin):
     queryset = Meeting.objects.order_by("-date")
+    serializer_classes = {
+        "retrieve": MeetingDetailSerializer,
+        "create": MeetingAddSerializer,
+        "confirmed": MeetingListSerializer,
+        "not_confirmed": ConfirmMeetingListSerializer,
+        "place": PlaceSerializer,
+    }
 
     def get_serializer_class(self):
-        if self.action == "create":
-            return MeetingAddSerializer
-        if self.action == "places":
-            return PlaceSerializer
-        return MeetingListSerializer
+        return self.serializer_classes.get(self.action, MeetingListSerializer)
 
     @extend_schema(summary="List of most used places", responses={200: PlaceSerializer(many=True)})
     @action(methods=["get"], detail=False)
@@ -33,27 +36,24 @@ class MeetingViewSet(
         places = Place.objects.annotate(meetings_count=Count("meeting")).order_by("-meetings_count")
         return Response(self.get_serializer(places, many=True).data, status=status.HTTP_200_OK)
 
-    @extend_schema(summary="List of meetings to confirm by you", responses={200: MeetingListSerializer(many=True)})
-    @action(methods=["get"], detail=False)
-    def to_confirm_by_you(self, request, *args, **kwargs):
-        meetings_to_confirm = self.queryset.filter(Q(attendance__confirmed=False) & Q(attendance__user=request.user))
-        serializer = self.get_serializer(meetings_to_confirm, many=True, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
     @extend_schema(
-        summary="List of meetings that wait to be confirmed by other users",
+        summary="List of meetings that are confirmed",
         responses={200: MeetingListSerializer(many=True)},
     )
     @action(methods=["get"], detail=False)
-    def to_confirm_by_others(self, request, *args, **kwargs):
-        not_confirmed_meetings = self.get_queryset().filter(confirmed_by_majority=False)
-        excluded_confirmed_by_you = not_confirmed_meetings.exclude(attendance__user=request.user)
-        serializer = self.get_serializer(excluded_confirmed_by_you, many=True, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def list(self, request, *args, **kwargs):
+    def confirmed(self, request, *args, **kwargs):
         queryset = self.get_queryset().filter(confirmed_by_majority=True)
         serializer = self.get_serializer(queryset, many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        summary="List of meetings that are confirmed",
+        responses={200: ConfirmMeetingListSerializer(many=True)},
+    )
+    @action(methods=["get"], detail=False)
+    def not_confirmed(self, request, *args, **kwargs):
+        not_confirmed_meetings = self.get_queryset().filter(confirmed_by_majority=False)
+        serializer = ConfirmMeetingListSerializer(not_confirmed_meetings, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
