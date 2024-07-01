@@ -15,12 +15,6 @@ class PlaceSerializer(serializers.ModelSerializer):
         read_only_fields = ["name"]
 
 
-class AttendanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Attendance
-        fields = "__all__"
-
-
 class UserMeetingSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -95,32 +89,6 @@ class MeetingAddSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class MeetingListSerializer(serializers.ModelSerializer):
-    users = serializers.SerializerMethodField()
-    place = PlaceSerializer()
-
-    def get_users(self, obj) -> int:
-        return obj.attendance_set.count()
-
-    class Meta:
-        model = Meeting
-        fields = ["id", "date", "confirmed_by_majority", "place", "casino", "pizza", "users"]
-
-
-class ConfirmMeetingListSerializer(MeetingListSerializer):
-    confirmed_by_you = serializers.SerializerMethodField()
-
-    def get_confirmed_by_you(self, obj):
-        user_participated = obj.attendance_set.filter(user=self.context["request"].user).first()
-        if not user_participated:
-            return False
-        return user_participated.confirmed
-
-    class Meta:
-        model = Meeting
-        fields = MeetingListSerializer.Meta.fields + ["confirmed_by_you"]
-
-
 class MeetingDetailSerializer(serializers.ModelSerializer):
     users = serializers.SerializerMethodField()
     place = PlaceSerializer()
@@ -131,3 +99,35 @@ class MeetingDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meeting
         fields = ["id", "date", "confirmed_by_majority", "place", "casino", "pizza", "users"]
+
+
+class MeetingListSerializer(MeetingDetailSerializer):
+    users = serializers.SerializerMethodField()
+
+    def get_users(self, obj) -> int:
+        return obj.attendance_set.count()
+
+    class Meta:
+        model = Meeting
+        fields = MeetingDetailSerializer.Meta.fields
+
+
+class ConfirmMeetingListSerializer(MeetingListSerializer):
+    confirmed_by_you = serializers.SerializerMethodField()
+    participated = serializers.SerializerMethodField()
+
+    def get_confirmed_by_you(self, obj) -> bool:
+        user_participated = obj.attendance_set.filter(user=self.context["request"].user).first()
+        if not user_participated:
+            return False
+        return user_participated.confirmed
+
+    def get_participated(self, obj) -> bool:
+        user_participated = obj.attendance_set.filter(user=self.context["request"].user).first()
+        if user_participated:
+            return True
+        return False
+
+    class Meta:
+        model = Meeting
+        fields = MeetingListSerializer.Meta.fields + ["confirmed_by_you", "participated"]
