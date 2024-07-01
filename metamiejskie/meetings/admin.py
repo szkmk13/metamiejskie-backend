@@ -3,9 +3,6 @@ from django.contrib import admin
 from metamiejskie.meetings.models import Meeting, Attendance, Place
 
 
-# Register your models here.
-
-
 class AttendanceInline(admin.TabularInline):
     model = Attendance
 

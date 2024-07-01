@@ -47,8 +47,8 @@ class MeetingViewSet(
     @action(methods=["get"], detail=False)
     def to_confirm_by_others(self, request, *args, **kwargs):
         not_confirmed_meetings = self.get_queryset().filter(confirmed_by_majority=False)
-        meetings_not_confirmed_by_other_users = not_confirmed_meetings.exclude(Q(attendance__user=request.user))
-        serializer = self.get_serializer(meetings_not_confirmed_by_other_users, many=True, context={"request": request})
+        excluded_confirmed_by_you = not_confirmed_meetings.exclude(attendance__user=request.user)
+        serializer = self.get_serializer(excluded_confirmed_by_you, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request, *args, **kwargs):
