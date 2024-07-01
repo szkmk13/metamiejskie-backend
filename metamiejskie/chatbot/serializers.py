@@ -10,7 +10,7 @@ class ChatListSerializer(serializers.ModelSerializer):
 
 
 class ChatAskSerializer(serializers.Serializer):
-    message = serializers.CharField()
+    message = serializers.JSONField()
 
 
 class ChatSerializer(serializers.ModelSerializer):
