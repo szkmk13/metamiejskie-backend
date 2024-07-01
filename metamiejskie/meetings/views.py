@@ -24,7 +24,7 @@ class MeetingViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.
         "create": MeetingAddSerializer,
         "confirmed": MeetingListSerializer,
         "not_confirmed": ConfirmMeetingListSerializer,
-        "place": PlaceSerializer,
+        "places": PlaceSerializer,
     }
 
     def get_serializer_class(self):

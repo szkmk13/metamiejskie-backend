@@ -117,10 +117,7 @@ class ConfirmMeetingListSerializer(MeetingListSerializer):
     participated = serializers.SerializerMethodField()
 
     def get_confirmed_by_you(self, obj) -> bool:
-        user_participated = obj.attendance_set.filter(user=self.context["request"].user).first()
-        if not user_participated:
-            return False
-        return user_participated.confirmed
+        return obj.confirmed_by_user(self.context['request'].user)
 
     def get_participated(self, obj) -> bool:
         user_participated = obj.attendance_set.filter(user=self.context["request"].user).first()
