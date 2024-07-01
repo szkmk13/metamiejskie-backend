@@ -10,7 +10,11 @@ class ChatListSerializer(serializers.ModelSerializer):
 
 
 class ChatAskSerializer(serializers.Serializer):
-    message = serializers.JSONField()
+    message = serializers.JSONField(
+        help_text='json in following format: [{"role":"user","content": "first message '
+        'content"}], then you just append with this OBJECT (not list) the '
+        "response you get from this endpoint."
+    )
 
 
 class ChatSerializer(serializers.ModelSerializer):

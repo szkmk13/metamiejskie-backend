@@ -1,5 +1,6 @@
 from allauth.account.models import EmailAddress
 from dj_rest_auth.serializers import PasswordResetSerializer
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, PasswordField
 from typing import Any, Dict, Optional, Type, TypeVar
@@ -72,6 +73,27 @@ class QuestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quest
         fields = ["id", "title", "description", "duration", "level_required", "can_start"]
+
+
+class DailyQuestStatusSerializer(serializers.ModelSerializer):
+    quest = QuestSerializer()
+    total_time = serializers.SerializerMethodField()
+    remaining_time = serializers.SerializerMethodField()
+    finished = serializers.SerializerMethodField()
+
+    def get_total_time(self, obj) -> int:
+        return int(obj.quest.duration.total_seconds())
+
+    def get_remaining_time(self, obj) -> int:
+        remaining = (obj.will_end_at - timezone.now()).total_seconds()
+        return int(remaining) if remaining > 0 else 0
+
+    def get_finished(self, obj) -> bool:
+        return timezone.now() > obj.will_end_at
+
+    class Meta:
+        model = DailyQuest
+        fields = ["id", "quest", "total_time", "remaining_time", "finished"]
 
 
 class PatchNotesSerializer(serializers.ModelSerializer):

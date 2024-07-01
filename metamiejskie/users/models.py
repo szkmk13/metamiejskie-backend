@@ -77,6 +77,9 @@ class User(AbstractUser):
     def has_daily_quest(self) -> bool:
         return self.daily_quests.filter(created_at__date=timezone.now()).exists()
 
+    def todays_quest(self) -> object | None:
+        return self.daily_quests.filter(created_at__date=timezone.now()).first()
+
     def tokens_redeemed(self) -> bool:
         if quest := self.daily_quests.filter(created_at__date=timezone.now()).first():
             return quest.redeemed

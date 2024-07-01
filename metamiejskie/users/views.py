@@ -19,6 +19,7 @@ from metamiejskie.users.serializers import (
     DailyQuestStartSerializer,
     QuestSerializer,
     PatchNotesSerializer,
+    DailyQuestStatusSerializer,
 )
 
 from django.http import Http404
@@ -86,19 +87,22 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
 class DailyQuestViewSet(GenericViewSet):
     serializer_class = DailyQuestSerializer
     queryset = DailyQuest.objects.all()
+    serializer_classes = {
+        "start": DailyQuestStartSerializer,
+        "choices": QuestSerializer,
+        "status": DailyQuestStatusSerializer,
+    }
 
     def get_queryset(self):
         return DailyQuest.objects.filter(user=self.request.user)  # type: ignore[misc]
 
     def get_serializer_class(self):
-        if self.action == "start":
-            return DailyQuestStartSerializer
-        return DailyQuestSerializer
+        return self.serializer_classes.get(self.action, DailyQuestSerializer)
 
     @extend_schema(request=None, responses=QuestSerializer(many=True), summary="List of possible daily quests")
     @action(detail=False, methods=["get"], pagination_class=None)
     def choices(self, request):
-        serializer = QuestSerializer(Quest.objects.all(), many=True, context={"request": request})
+        serializer = self.get_serializer(Quest.objects.all(), many=True, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
     @extend_schema(
@@ -124,3 +128,11 @@ class DailyQuestViewSet(GenericViewSet):
             return Response("Quest already started, wait for it to end", status=status.HTTP_400_BAD_REQUEST)
         request.user.redeem_from_quest(qs.first())
         return Response(status=status.HTTP_200_OK, data="Rewards redeemed")
+
+    @extend_schema(request=None, responses={200: DailyQuestStatusSerializer}, summary="Status of a daily quest")
+    @action(detail=False, methods=["get"])
+    def status(self, request):
+        if not request.user.has_daily_quest():
+            return Response({"detail": "Quest not started"}, status.HTTP_408_REQUEST_TIMEOUT)
+        serializer = self.get_serializer(request.user.todays_quest(), context={"request": request})
+        return Response(serializer.data)

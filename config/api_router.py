@@ -11,7 +11,7 @@ from metamiejskie.users.views import UserViewSet, DailyQuestViewSet, PatchNotesV
 router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
 router.register("users", UserViewSet)
-router.register("casino", GameViewSet)
+# router.register("casino", GameViewSet)
 router.register("quests", DailyQuestViewSet)
 router.register("chatbot", ChatBotViewSet)
 router.register("meetings", MeetingViewSet)
