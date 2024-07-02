@@ -1,5 +1,5 @@
 """
-With these settings, tests run faster.
+With these settings, tests play faster.
 """
 
 from .base import *  # noqa: F403

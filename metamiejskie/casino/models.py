@@ -1,4 +1,6 @@
 import enum
+import itertools
+from abc import abstractmethod
 from random import shuffle
 
 from django.core.validators import MinValueValidator
@@ -31,12 +33,8 @@ class Symbol(models.Model):
 
 class Game(models.Model):
     name = models.CharField(max_length=50)
-    # lines = models.PositiveIntegerField(default=1)
-    symbols = models.ManyToManyField(to=Symbol, related_name="games")
+    symbols = models.ManyToManyField(to=Symbol, related_name="games", blank=True)
 
-    # for now lets assume its only 3x3 game with 3 winning lanes top mid and bottom
-
-    # 3x3 czy 3x5 czy 5x5
     @property
     def spins(self):
         return self.spin_set.count()
@@ -51,7 +49,7 @@ class Game(models.Model):
         shuffle(all_symbols)
         return all_symbols[0]
 
-    def run(self, user, chosen_lines, *args, **kwargs):
+    def play(self, user, chosen_lines, *args, **kwargs):
         result = []
         for _row in range(3):
             row_result = []
@@ -70,3 +68,17 @@ class Spin(models.Model):
     won = models.BooleanField(default=False)
     chosen_lines = models.PositiveIntegerField()
     amount = models.DecimalField(max_digits=5, decimal_places=2, default=10, validators=[MinValueValidator(10)])
+
+
+class HighCard(Game):
+    CARD_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"]
+    CARD_SUITS = ["clubs", "hearts", "diamonds", "spades"]
+
+    deck = models.JSONField(default=[f"{x} of {y}" for x, y in itertools.product(CARD_VALUES, CARD_SUITS)])
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def play(self):
+        shuffle(self.deck)
+        card = self.deck[0]
+        print(card)
+        return card

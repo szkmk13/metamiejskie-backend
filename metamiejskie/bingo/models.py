@@ -97,7 +97,7 @@ class Bingo(models.Model):
 class BingoEntry(models.Model):
     """Used to statistics"""
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     bingo = models.ForeignKey(Bingo, on_delete=models.CASCADE)
     bingo_field = models.ForeignKey(BingoField, on_delete=models.CASCADE)
 

@@ -19,7 +19,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-from metamiejskie.casino.views import GameViewSet
+from metamiejskie.casino.views import CasinoViewSet
 from metamiejskie.users.views import MetamiejskieConfirmEmailView
 
 urlpatterns = [
