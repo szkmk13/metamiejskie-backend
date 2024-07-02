@@ -32,7 +32,7 @@ class Symbol(models.Model):
 
 
 class Game(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50,default="")
     symbols = models.ManyToManyField(to=Symbol, related_name="games", blank=True)
 
     @property
@@ -65,20 +65,11 @@ class Spin(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     time = models.DateTimeField(auto_now_add=True)
 
-    won = models.BooleanField(default=False)
-    chosen_lines = models.PositiveIntegerField()
-    amount = models.DecimalField(max_digits=5, decimal_places=2, default=10, validators=[MinValueValidator(10)])
+    has_won = models.BooleanField(default=False)
+    chosen_lines = models.PositiveIntegerField(default=1)
+    reward = models.DecimalField(max_digits=5, decimal_places=2, default=10, validators=[MinValueValidator(1)])
 
 
 class HighCard(Game):
-    CARD_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"]
-    CARD_SUITS = ["clubs", "hearts", "diamonds", "spades"]
-
-    deck = models.JSONField(default=[f"{x} of {y}" for x, y in itertools.product(CARD_VALUES, CARD_SUITS)])
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def play(self):
-        shuffle(self.deck)
-        card = self.deck[0]
-        print(card)
-        return card
+    last_card = models.CharField(max_length=20, default="")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)

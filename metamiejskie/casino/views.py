@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from metamiejskie.casino.models import Game, HighCard
+from metamiejskie.casino.models import Game, HighCard, Spin
 from metamiejskie.casino.serializers import (
     GameSerializer,
     GameSpinSerializer,
@@ -78,10 +78,9 @@ class CasinoViewSet(ListModelMixin, GenericViewSet):
     def play_high_card(self, request, *args, **kwargs):
         serializer = HighCardPlaySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        game_object = Game.objects.get(name="HighCard")
-        shuffle(self.DECK)
-
+        game_object, _ = HighCard.objects.get_or_create(user=request.user)
         bet_amount = serializer.validated_data["bet_amount"]
+        shuffle(self.DECK)
         card_value, card_suit = self.DECK[0].split("of")
         data = {
             "bet_amount": bet_amount,
@@ -90,15 +89,26 @@ class CasinoViewSet(ListModelMixin, GenericViewSet):
         }
         if bet_amount == 0:
             data["demo_play"] = True
+            game_object.last_card = self.DECK[0]
+            game_object.save()
             return Response(HighCardResultSerializer(data).data)
+        print(game_object.last_card)
+        print(self.DECK[-1])
+        card_value, card_suit = game_object.last_card.split("of")
+        data = {
+            "bet_amount": bet_amount,
+            "card_suit": card_suit,
+            "card_value": card_value,
+        }
         data["next_card_value"] = self.DECK[-1].split("of")[0]
+        game_object.last_card = self.DECK[-1]
+        game_object.save()
         data["bet"] = serializer.validated_data["bet"]
         serializer = HighCardResultSerializer(data=data, context={"user": request.user})
         serializer.is_valid(raise_exception=True)
+        # move to serializer
+        Spin.objects.create(
+            game=game_object, user=request.user, has_won=serializer.data["has_won"], reward=serializer.data["reward"]
+        )
 
-        print(serializer.data)
-        # card = self.deck[0]
-        # result = obj.play()
-        # result = SpinResultSerializer(obj.play(self.request.user, serializer.validated_data["lines_chosen"]))
-        # print(obj)
         return Response(serializer.data)

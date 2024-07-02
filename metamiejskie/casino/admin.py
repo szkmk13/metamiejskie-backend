@@ -6,7 +6,7 @@ from metamiejskie.casino.models import Spin, Game, Symbol, HighCard
 
 @admin.register(HighCard)
 class CardGameAdmin(admin.ModelAdmin):
-    list_display = ("user",)
+    list_display = ("name",)
     actions = ["play"]
 
     @admin.action()
@@ -23,7 +23,7 @@ class SymbolAdmin(admin.ModelAdmin):
 
 @admin.register(Spin)
 class SpinAdmin(admin.ModelAdmin):
-    list_display = ("user", "game", "amount")
+    list_display = ("user", "game", "reward")
 
 
 class SpinInline(admin.TabularInline):
@@ -31,16 +31,15 @@ class SpinInline(admin.TabularInline):
     extra = 0
 
 
-#
-# @admin.register(Game)
-# class GameAdmin(admin.ModelAdmin):
-#     list_display = ("name", "spins", "id")
-#     actions = ["play"]
-#     # ordering = ['spins']
-#     inlines = [SpinInline]
-#
-#     @admin.action()
-#     def run(self, request, queryset):
-#         obj = queryset.first()
-#         obj.play(user=request.user, chosen_lines=1)
-#         return HttpResponseRedirect("/admin/casino/game")
+@admin.register(Game)
+class GameAdmin(admin.ModelAdmin):
+    list_display = ("name", "spins", "id")
+    actions = ["play"]
+    # ordering = ['spins']
+    inlines = [SpinInline]
+
+    @admin.action()
+    def run(self, request, queryset):
+        obj = queryset.first()
+        obj.play(user=request.user, chosen_lines=1)
+        return HttpResponseRedirect("/admin/casino/game")
