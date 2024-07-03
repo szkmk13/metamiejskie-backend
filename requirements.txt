@@ -21,6 +21,8 @@ dj-rest-auth==5.0.1 # https://github.com/iMerica/dj-rest-auth
 drf-spectacular==0.27.2  # https://github.com/tfranzel/drf-spectacular
 # TESTS
 #kolo==2.28.0
+factory-boy==3.3.0  # https://github.com/FactoryBoy/factory_boy
+pytest-cov==5.0.0
 pytest-cov==5.0.0
 # GROQ
 groq==0.9.0
