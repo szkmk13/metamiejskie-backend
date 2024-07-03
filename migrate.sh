@@ -1,7 +1,7 @@
 # migrate.sh
-python3 -m venv venv
+#python3 -m venv venv
 # activate the virtual environment
-source venv/bin/activate
+#source venv/bin/activate
 pip install -r requirements.txt
 python3 manage.py migrate
-#python3 manage.py collectstatic --noinput
+python3 manage.py collectstatic --noinput
