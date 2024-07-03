@@ -35,7 +35,6 @@ class SpinInline(admin.TabularInline):
 class GameAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "spins")
     actions = ["play"]
-    # ordering = ['spins']
     inlines = [SpinInline]
 
     @admin.action()

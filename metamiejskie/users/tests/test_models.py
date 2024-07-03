@@ -5,12 +5,10 @@ from django.utils import timezone
 from rest_framework.test import APITestCase, APIClient
 
 from metamiejskie.users.tests.factories import UserFactory, QuestFactory, DailyQuestFactory
-from metamiejskie.utils import variables_setup
 
 
 class TestUserModel(APITestCase):
     def setUp(self):
-        variables_setup()
         self.user = UserFactory()
 
     def test_quest_string(self):

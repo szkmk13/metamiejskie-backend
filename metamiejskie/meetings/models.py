@@ -1,9 +1,4 @@
-import datetime
-
 from django.db import models
-from django.db.models import Model, DateTimeField, Sum
-from django.utils import timezone
-
 from metamiejskie.users.models import User
 
 

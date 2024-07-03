@@ -1,20 +1,17 @@
 import itertools
 from random import shuffle
 
-from django.shortcuts import render
 from drf_spectacular.utils import extend_schema
-from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import ListModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import GenericViewSet
 
-from metamiejskie.casino.models import Game, HighCard, Spin
+from metamiejskie.casino.models import Game, HighCard
 from metamiejskie.casino.serializers import (
     GameSerializer,
     GameSpinSerializer,
-    SpinResultSerializer,
     HighCardResultSerializer,
     HighCardPlaySerializer,
 )
@@ -35,7 +32,6 @@ class CardGameViewSet(GenericViewSet):
 
 @extend_schema(tags=["casino WORK IN PROGRESS"])
 class CasinoViewSet(ListModelMixin, GenericViewSet):
-    queryset = Game.objects.all()
     permission_classes = [IsAuthenticated]
 
     CARD_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"]
@@ -45,29 +41,29 @@ class CasinoViewSet(ListModelMixin, GenericViewSet):
     def get_serializer_class(self):
         if self.action == "spin":
             return GameSpinSerializer
-        return GameSpinSerializer
+        return GameSerializer
 
     def get_queryset(self):
-        return Game.objects.all()
+        return Game.objects.exclude(name__endswith="high card")
 
     @extend_schema(summary="Get list of possible games")
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @extend_schema(
-        request=GameSpinSerializer,
-        responses={200: SpinResultSerializer},
-        summary="""Provide id of the game and play it""",
-    )
-    @action(methods=["post"], detail=True)
-    def spin(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        obj = self.get_object()
-        result = obj.play()
-        result = SpinResultSerializer(obj.play(self.request.user, serializer.validated_data["lines_chosen"]))
-        print(obj)
-        return Response(result.data)
+    # @extend_schema(
+    #     request=GameSpinSerializer,
+    #     responses={200: SpinResultSerializer},
+    #     summary="""Provide id of the game and play it""",
+    # )
+    # @action(methods=["post"], detail=True)
+    # def spin(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     obj = self.get_object()
+    #     result = obj.play()
+    #     result = SpinResultSerializer(obj.play(self.request.user, serializer.validated_data["lines_chosen"]))
+    #     print(obj)
+    #     return Response(result.data)
 
     @extend_schema(
         request=HighCardPlaySerializer,
@@ -78,7 +74,7 @@ class CasinoViewSet(ListModelMixin, GenericViewSet):
     def play_high_card(self, request, *args, **kwargs):
         serializer = HighCardPlaySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        game_object, _ = HighCard.objects.get_or_create(user=request.user, name="high card")
+        game_object, _ = HighCard.objects.get_or_create(user=request.user, name=f"{request.user.id}high card")
         bet_amount = serializer.validated_data["bet_amount"]
         shuffle(self.DECK)
         next_card = self.DECK[0]

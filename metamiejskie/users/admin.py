@@ -1,23 +1,16 @@
-# from allauth.account.decorators import secure_admin_login
-from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.utils.translation import gettext_lazy as _
 
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
-from .models import User, Quest, DailyQuest, DailyCoins, Variables, PatchNotes
+from .models import User, Quest, DailyQuest, DailyCoins, PatchNotes
 
 
 @admin.register(PatchNotes)
 class PatchNotesAdmin(admin.ModelAdmin):
     list_display = ("version", "date", "text")
     list_filter = ("date",)
-
-
-@admin.register(Variables)
-class VariablesAdmin(admin.ModelAdmin):
-    list_display = ("name", "value")
 
 
 @admin.register(Quest)

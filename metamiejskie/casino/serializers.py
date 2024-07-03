@@ -52,6 +52,8 @@ class HighCardResultSerializer(Serializer):
     bet = CharField(write_only=True)
 
     FACES_VALUES = {"J": 11, "Q": 12, "K": 13, "A": 14}
+    HIGH_LOW_MULTIPLIER = 1.5
+    EQUAL_MULTIPLIER = 7
 
     class Meta:
         fields = "__all__"
@@ -76,19 +78,19 @@ class HighCardResultSerializer(Serializer):
         user.coins -= bet_amount
         if bet == "high":
             if next_card_value > previous_card_value:
-                user.coins += 2 * bet_amount
+                user.coins += self.HIGH_LOW_MULTIPLIER * bet_amount
                 attrs["has_won"] = True
-                attrs["reward"] = 2 * bet_amount
+                attrs["reward"] = self.HIGH_LOW_MULTIPLIER * bet_amount
         elif bet == "low":
             if next_card_value < previous_card_value:
-                user.coins += 2 * bet_amount
+                user.coins += self.HIGH_LOW_MULTIPLIER * bet_amount
                 attrs["has_won"] = True
-                attrs["reward"] = 2 * bet_amount
+                attrs["reward"] = self.HIGH_LOW_MULTIPLIER * bet_amount
         elif bet == "equal":
             if next_card_value == previous_card_value:
-                user.coins += 5 * bet_amount
+                user.coins += self.EQUAL_MULTIPLIER * bet_amount
                 attrs["has_won"] = True
-                attrs["reward"] = 5 * bet_amount
+                attrs["reward"] = self.EQUAL_MULTIPLIER * bet_amount
         spin = Spin(game=self.context["game_object"], user=user, has_won=attrs["has_won"])
         if attrs["has_won"]:
             spin.amount = attrs["reward"]

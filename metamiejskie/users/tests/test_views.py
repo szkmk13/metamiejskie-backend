@@ -5,12 +5,10 @@ from django.utils import timezone
 from rest_framework.test import APITestCase, APIClient
 
 from metamiejskie.users.tests.factories import UserFactory, QuestFactory, DailyQuestFactory
-from metamiejskie.utils import variables_setup
 
 
 class TestUserViewSet(APITestCase):
     def setUp(self):
-        variables_setup()
         self.client = APIClient()
         self.user = UserFactory()
         self.client.force_authenticate(user=self.user)
@@ -51,7 +49,6 @@ class TestUserViewSet(APITestCase):
 
 class TestDailyQuestViewSet(APITestCase):
     def setUp(self):
-        variables_setup()
         self.client = APIClient()
         self.user = UserFactory()
         self.quest = QuestFactory(duration=timedelta(minutes=1))

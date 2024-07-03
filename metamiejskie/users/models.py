@@ -3,7 +3,6 @@ import math
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CharField, Sum
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -41,12 +40,6 @@ class VariablesManager(models.Manager):
 
     def by_name(self, name):
         return self.filter(name=name).first().value
-
-
-class Variables(models.Model):
-    name = models.CharField(max_length=50)
-    value = models.FloatField()
-    objects = VariablesManager()
 
 
 class User(AbstractUser):

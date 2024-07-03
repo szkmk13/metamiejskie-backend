@@ -1,8 +1,5 @@
-import groq
-from django.conf import settings
-from django.shortcuts import render
 from drf_spectacular.utils import extend_schema
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -12,10 +9,7 @@ from metamiejskie.chatbot.serializers import ChatSerializer, ChatListSerializer,
 
 
 @extend_schema(tags=["chatbot"])
-class ChatBotViewSet(
-    # mixins.CreateModelMixin, mixins.ListModelMixin,
-    viewsets.GenericViewSet
-):
+class ChatBotViewSet(viewsets.GenericViewSet):
     queryset = Chat.objects.all()
     serializer_class = ChatSerializer
 
@@ -29,6 +23,7 @@ class ChatBotViewSet(
 
     def get_queryset(self):
         return Chat.objects.filter(user=self.request.user)  # type: ignore[misc]
+
     @extend_schema(summary="Talk to rozpalony")
     @action(detail=False, methods=["POST"])
     def talk(self, request, *args, **kwargs):
@@ -39,18 +34,3 @@ class ChatBotViewSet(
         response = client.get_completion(chat_messages)
         chat_messages.append({"role": "assistant", "content": response})
         return Response(chat_messages)
-
-    # @action(detail=True, methods=["POST"])
-    # def talk(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     message = serializer.validated_data["message"]
-    #     chat = self.get_object()
-    #     chat_messages = chat.context
-    #     chat_messages.append({"role": "user", "content": message})
-    #     client = GroqClient()
-    #     response = client.get_completion(chat_messages)
-    #     chat_messages.append({"role": "assistant", "content": response})
-    #     chat.context = chat_messages
-    #     chat.save(update_fields=["context"])
-    #     return Response(response)

@@ -4,9 +4,6 @@ from django.utils.html import format_html
 from metamiejskie.chatbot.models import Chat
 
 
-# Register your models here.
-
-
 @admin.register(Chat)
 class ChatAdmin(admin.ModelAdmin):
     list_display = ("user", "created_at", "chat_history")

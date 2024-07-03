@@ -35,6 +35,9 @@ class Game(models.Model):
     name = models.CharField(max_length=50, default="")
     symbols = models.ManyToManyField(to=Symbol, related_name="games", blank=True)
 
+    def __str__(self):
+        return self.name
+
     @property
     def spins(self):
         return self.spin_set.count()

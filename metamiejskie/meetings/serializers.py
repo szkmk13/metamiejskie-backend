@@ -1,7 +1,5 @@
-from django.core.validators import BaseValidator, MinLengthValidator
 from django.utils import timezone
-from rest_framework import serializers, permissions, viewsets
-from rest_framework.exceptions import APIException
+from rest_framework import serializers
 
 from metamiejskie.meetings.models import Meeting, Attendance, Place
 from metamiejskie.users.models import User

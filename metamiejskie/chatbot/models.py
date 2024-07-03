@@ -3,9 +3,6 @@ from django.db import models
 from metamiejskie.users.models import User
 
 
-# Create your models here.
-
-
 class Chat(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

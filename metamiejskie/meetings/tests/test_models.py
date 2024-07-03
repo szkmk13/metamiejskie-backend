@@ -11,12 +11,10 @@ from metamiejskie.meetings.tests.factories import (
     AttendanceFactory,
 )
 from metamiejskie.users.tests.factories import UserFactory, QuestFactory, DailyQuestFactory
-from metamiejskie.utils import variables_setup
 
 
 class TestMeetingModels(APITestCase):
     def setUp(self):
-        variables_setup()
         self.client = APIClient()
         self.user = UserFactory()
         self.client.force_authenticate(user=self.user)

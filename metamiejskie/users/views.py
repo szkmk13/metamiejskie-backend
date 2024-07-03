@@ -53,11 +53,12 @@ class MetamiejskieConfirmEmailView(GenericAPIView):
         return Response({"detail": "Email confirmed"})
 
 
-@extend_schema(tags=["patch notes"],summary="List of patch notes ordered by date")
+@extend_schema(tags=["patch notes"], summary="List of patch notes ordered by date")
 class PatchNotesView(ListModelMixin, GenericViewSet):
     permission_classes = [AllowAny]
     queryset = PatchNotes.objects.order_by("-date")
     serializer_class = PatchNotesSerializer
+
 
 @extend_schema(summary="Default actions to users")
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
@@ -69,6 +70,7 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
 
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, UserDetailSerializer)
+
     @extend_schema(summary="Info about current user")
     @action(detail=False)
     def me(self, request):
@@ -124,7 +126,7 @@ class DailyQuestViewSet(GenericViewSet):
         if request.user.tokens_redeemed():
             return Response("Rewards already redeemed", status=status.HTTP_400_BAD_REQUEST)
         now = timezone.now()
-        qs = self.get_queryset().filter(created_at__date=now)
+        qs = self.get_queryset().filter(will_end_at__date=now)
         if qs.count() == 0:
             return Response("No daily quest", status=status.HTTP_400_BAD_REQUEST)
         if qs.filter(will_end_at__gte=now).exists():
