@@ -2,7 +2,7 @@ import math
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import CharField
+from django.db.models import CharField, Sum
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -101,6 +101,18 @@ class User(AbstractUser):
     @property
     def daily_coins_redeemed(self) -> bool:
         return self.daily_coins.filter(date=timezone.now()).exists()
+
+    @property
+    def coins_lost_in_casino(self) -> int:
+        return int(self.spin_set.aggregate(Sum("amount", default=0))["amount__sum"])
+
+    @property
+    def casino_wins(self) -> int:
+        return self.spin_set.filter(has_won=True).count()
+
+    @property
+    def casino_loses(self) -> int:
+        return self.spin_set.filter(has_won=False).count()
 
 
 class DailyCoins(models.Model):

@@ -78,37 +78,30 @@ class CasinoViewSet(ListModelMixin, GenericViewSet):
     def play_high_card(self, request, *args, **kwargs):
         serializer = HighCardPlaySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        game_object, _ = HighCard.objects.get_or_create(user=request.user)
+        game_object, _ = HighCard.objects.get_or_create(user=request.user, name="high card")
         bet_amount = serializer.validated_data["bet_amount"]
         shuffle(self.DECK)
-        card_value, card_suit = self.DECK[0].split("of")
-        data = {
-            "bet_amount": bet_amount,
-            "card_suit": card_suit,
-            "card_value": card_value,
-        }
+        next_card = self.DECK[0]
+
         if bet_amount == 0:
-            data["demo_play"] = True
-            game_object.last_card = self.DECK[0]
+            card_value, card_suit = next_card.split("of")
+            data = {"bet_amount": bet_amount, "card_suit": card_suit, "card_value": card_value, "demo_play": True}
+            game_object.last_card = next_card
             game_object.save()
             return Response(HighCardResultSerializer(data).data)
-        print(game_object.last_card)
-        print(self.DECK[-1])
-        card_value, card_suit = game_object.last_card.split("of")
+
+        next_card_value, next_card_suit = next_card.split("of")
         data = {
             "bet_amount": bet_amount,
-            "card_suit": card_suit,
-            "card_value": card_value,
+            "card_suit": next_card_suit,
+            "card_value": next_card_value,
+            "previous_card_value": game_object.last_card.split("of")[0],
+            "next_card_value": next_card_value,
+            "bet": serializer.validated_data["bet"],
         }
-        data["next_card_value"] = self.DECK[-1].split("of")[0]
-        game_object.last_card = self.DECK[-1]
-        game_object.save()
-        data["bet"] = serializer.validated_data["bet"]
-        serializer = HighCardResultSerializer(data=data, context={"user": request.user})
-        serializer.is_valid(raise_exception=True)
-        # move to serializer
-        Spin.objects.create(
-            game=game_object, user=request.user, has_won=serializer.data["has_won"], reward=serializer.data["reward"]
-        )
 
+        serializer = HighCardResultSerializer(data=data, context={"user": request.user, "game_object": game_object})
+        serializer.is_valid(raise_exception=True)
+        game_object.last_card = next_card
+        game_object.save()
         return Response(serializer.data)

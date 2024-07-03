@@ -32,7 +32,7 @@ class Symbol(models.Model):
 
 
 class Game(models.Model):
-    name = models.CharField(max_length=50,default="")
+    name = models.CharField(max_length=50, default="")
     symbols = models.ManyToManyField(to=Symbol, related_name="games", blank=True)
 
     @property
@@ -67,7 +67,7 @@ class Spin(models.Model):
 
     has_won = models.BooleanField(default=False)
     chosen_lines = models.PositiveIntegerField(default=1)
-    reward = models.DecimalField(max_digits=5, decimal_places=2, default=10, validators=[MinValueValidator(1)])
+    amount = models.DecimalField(max_digits=5, decimal_places=2, default=10, validators=[MinValueValidator(1)])
 
 
 class HighCard(Game):

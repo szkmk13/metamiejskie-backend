@@ -11,7 +11,7 @@ from metamiejskie.chatbot.models import Chat
 from metamiejskie.chatbot.serializers import ChatSerializer, ChatListSerializer, ChatAskSerializer
 
 
-@extend_schema(tags=["chatbot WORK IN PROGRESS"])
+@extend_schema(tags=["chatbot"])
 class ChatBotViewSet(
     # mixins.CreateModelMixin, mixins.ListModelMixin,
     viewsets.GenericViewSet

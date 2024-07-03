@@ -14,12 +14,13 @@ from metamiejskie.users.models import User, DailyQuest, Quest, DailyCoins, Patch
 from metamiejskie.permissions import IsYouOrReadOnly
 
 from metamiejskie.users.serializers import (
-    UserSerializer,
+    UserListSerializer,
     DailyQuestSerializer,
     DailyQuestStartSerializer,
     QuestSerializer,
     PatchNotesSerializer,
     DailyQuestStatusSerializer,
+    UserDetailSerializer,
 )
 
 from django.http import Http404
@@ -40,6 +41,7 @@ class MetamiejskieConfirmEmailView(GenericAPIView):
             raise Http404()
         return emailconfirmation
 
+    @extend_schema(request=None, responses={200: None})
     def post(self, *args, **kwargs):
         self.object = confirmation = self.get_object()
         email_address = confirmation.confirm(self.request)
@@ -60,16 +62,18 @@ class PatchNotesView(ListModelMixin, GenericViewSet):
 
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
-    serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [IsYouOrReadOnly]
+    serializer_classes = {
+        "list": UserListSerializer,
+    }
 
-    def get_queryset(self):
-        return User.objects.all()
+    def get_serializer_class(self):
+        return self.serializer_classes.get(self.action, UserDetailSerializer)
 
     @action(detail=False)
     def me(self, request):
-        serializer = UserSerializer(request.user, context={"request": request})
+        serializer = self.get_serializer(request.user, context={"request": request})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
     @extend_schema(tags=["daily"], summary="Redeem daily coins")

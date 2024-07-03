@@ -22,31 +22,32 @@ class TestMeetingsViewset(APITestCase):
         self.assertEqual(len(response.data), 1)
 
     def test_meetings_list_no_meetings(self):
-        response = self.client.get("/api/meetings/")
+        response = self.client.get("/api/meetings/confirmed/")
         self.assertEqual(len(response.data), 0)
 
     def test_meetings_list_0_confirmed_meeting(self):
         MeetingFactory()
-        response = self.client.get("/api/meetings/")
+        response = self.client.get("/api/meetings/confirmed/")
         self.assertEqual(len(response.data), 0)
 
     def test_meetings_list_1_confirmed_meeting(self):
         MeetingFactory(confirmed_by_majority=True)
-        response = self.client.get("/api/meetings/")
+        response = self.client.get("/api/meetings/confirmed/")
         self.assertEqual(len(response.data), 1)
 
     def test_meetings_to_confirm_by_you(self):
         meeting = MeetingFactory()
         AttendanceFactory(user=self.user, meeting=meeting)
-        response = self.client.get("/api/meetings/to_confirm_by_you/")
+        response = self.client.get("/api/meetings/not_confirmed/")
         self.assertEqual(len(response.data), 1)
 
     def test_meetings_to_confirm_by_others(self):
         meeting = MeetingFactory()
         AttendanceFactory(user=self.user, meeting=meeting, confirmed=True)
         AttendanceFactory(meeting=meeting)
-        response = self.client.get("/api/meetings/to_confirm_by_others/")
-        self.assertEqual(len(response.data), 0)
+        AttendanceFactory(meeting=meeting)
+        response = self.client.get("/api/meetings/not_confirmed/")
+        self.assertEqual(len(response.data), 1)
 
     def test_decline_meeting(self):
         meeting = MeetingFactory()

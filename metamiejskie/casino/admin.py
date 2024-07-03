@@ -23,7 +23,7 @@ class SymbolAdmin(admin.ModelAdmin):
 
 @admin.register(Spin)
 class SpinAdmin(admin.ModelAdmin):
-    list_display = ("user", "game", "reward")
+    list_display = ("user", "game", "amount")
 
 
 class SpinInline(admin.TabularInline):
@@ -33,7 +33,7 @@ class SpinInline(admin.TabularInline):
 
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ("name", "spins", "id")
+    list_display = ("id", "name", "spins")
     actions = ["play"]
     # ordering = ['spins']
     inlines = [SpinInline]

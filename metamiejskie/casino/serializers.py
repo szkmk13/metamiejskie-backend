@@ -1,7 +1,7 @@
 from rest_framework.serializers import *
 from django.core.validators import MinValueValidator
 
-from metamiejskie.casino.models import Game, Symbol
+from metamiejskie.casino.models import Game, Symbol, Spin
 from metamiejskie.utils import DetailException
 
 
@@ -48,6 +48,7 @@ class HighCardResultSerializer(Serializer):
     reward = IntegerField(default=0)
 
     next_card_value = CharField(write_only=True)
+    previous_card_value = CharField(write_only=True)
     bet = CharField(write_only=True)
 
     FACES_VALUES = {"J": 11, "Q": 12, "K": 13, "A": 14}
@@ -57,7 +58,9 @@ class HighCardResultSerializer(Serializer):
 
     def validate(self, attrs):
         previous_card_value = (
-            self.FACES_VALUES.get(attrs["card_value"]) if attrs["card_value"].isalpha() else int(attrs["card_value"])
+            self.FACES_VALUES.get(attrs["previous_card_value"])
+            if attrs["previous_card_value"].isalpha()
+            else int(attrs["previous_card_value"])
         )
         next_card_value = (
             self.FACES_VALUES.get(attrs["next_card_value"])
@@ -83,10 +86,16 @@ class HighCardResultSerializer(Serializer):
                 attrs["reward"] = 2 * bet_amount
         elif bet == "equal":
             if next_card_value == previous_card_value:
-                user.coins += 10 * bet_amount
+                user.coins += 5 * bet_amount
                 attrs["has_won"] = True
-                attrs["reward"] = 10 * bet_amount
+                attrs["reward"] = 5 * bet_amount
+        spin = Spin(game=self.context["game_object"], user=user, has_won=attrs["has_won"])
+        if attrs["has_won"]:
+            spin.amount = attrs["reward"]
+        else:
+            spin.amount = bet_amount
         user.save(update_fields=["coins"])
+        spin.save()
         return attrs
 
 

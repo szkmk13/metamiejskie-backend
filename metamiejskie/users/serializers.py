@@ -29,10 +29,25 @@ class CustomLoginSerializer(TokenObtainPairSerializer):
         return super().validate(attrs)
 
 
-class UserSerializer(serializers.ModelSerializer[User]):
+class UserListSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
-        fields = ["id", "username", "points", "coins", "exp", "exp_to_next_level", "level", "daily_coins_redeemed"]
+        fields = ["id", "username", "points"]
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = UserListSerializer.Meta.fields + [
+            "coins",
+            "exp",
+            "exp_to_next_level",
+            "level",
+            "daily_coins_redeemed",
+            "coins_lost_in_casino",
+            "casino_wins",
+            "casino_loses",
+        ]
 
 
 class DailyQuestSerializer(serializers.ModelSerializer):

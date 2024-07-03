@@ -30,7 +30,7 @@ urlpatterns = [
     # path('api/auth/verify-email/', VerifyEmailView.as_view(), name='rest_verify_email'),
     path("api/auth/resend-email/", ResendEmailVerificationView.as_view(), name="rest_resend_email"),
     path(
-        "api/auth/account-confirm-email/<key>/",
+        "api/auth/account-confirm-email/<str:key>/",
         MetamiejskieConfirmEmailView.as_view(),
         name="account_confirm_email",
     ),
@@ -41,7 +41,9 @@ urlpatterns = [
     ),
     # PASSWORD RESET
     path(
-        "api/auth/password/reset/confirm/<id>/<key>/", PasswordResetConfirmView.as_view(), name="password_reset_confirm"
+        "api/auth/password/reset/confirm/<int:id>/<str:key>/",
+        PasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
     ),
     path("api/auth/password/change/", PasswordChangeView.as_view(), name="rest_password_change"),
     path("api/auth/password/reset/", PasswordResetView.as_view(), name="rest_password_reset"),
