@@ -331,5 +331,6 @@ metamiejskie/media/
 .pytest_cache/
 /db.sql
 /.kolo/
-/metamiejskie/static/
+#/metamiejskie/static/
+#/metamiejskie/static/*
 /docs/
