@@ -12,9 +12,8 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 CORS_ALLOWED_ORIGINS = [
     "https://vercel.app",
 ]
-ALLOWED_HOSTS = [
-    ".vercel.app",
-]
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+
 # DATABASES
 # ------------------------------------------------------------------------------
 DATABASES = {"default": env.db("POSTGRES_URL")}
