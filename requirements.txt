@@ -10,8 +10,8 @@ django==4.2.13  # pyup: < 5.0  # https://www.djangoproject.com/
 django-environ==0.11.2  # https://github.com/joke2k/django-environ
 django-model-utils==4.5.1  # https://github.com/jazzband/django-model-utils
 django-allauth[mfa]==0.63.2  # https://github.com/pennersr/django-allauth
-#django-crispy-forms==2.1  # https://github.com/django-crispy-forms/django-crispy-forms
-#crispy-bootstrap5==2024.2  # https://github.com/django-crispy-forms/crispy-bootstrap5
+django-crispy-forms==2.1  # https://github.com/django-crispy-forms/django-crispy-forms
+crispy-bootstrap5==2024.2  # https://github.com/django-crispy-forms/crispy-bootstrap5
 # Django REST Framework
 djangorestframework==3.15.1  # https://github.com/encode/django-rest-framework
 django-cors-headers==4.3.1  # https://github.com/adamchainz/django-cors-headers
@@ -21,7 +21,7 @@ dj-rest-auth==5.0.1 # https://github.com/iMerica/dj-rest-auth
 drf-spectacular==0.27.2  # https://github.com/tfranzel/drf-spectacular
 # TESTS
 factory-boy==3.3.0  # https://github.com/FactoryBoy/factory_boy
-pytest-cov==5.0.0
+#pytest-cov==5.0.0
 # GROQ
 groq==0.9.0
 # PRODUCTION
