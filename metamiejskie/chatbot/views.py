@@ -29,7 +29,7 @@ class ChatBotViewSet(
 
     def get_queryset(self):
         return Chat.objects.filter(user=self.request.user)  # type: ignore[misc]
-
+    @extend_schema(summary="Talk to rozpalony")
     @action(detail=False, methods=["POST"])
     def talk(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

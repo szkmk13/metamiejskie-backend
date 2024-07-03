@@ -67,7 +67,7 @@ class Spin(models.Model):
 
     has_won = models.BooleanField(default=False)
     chosen_lines = models.PositiveIntegerField(default=1)
-    amount = models.DecimalField(max_digits=5, decimal_places=2, default=10, validators=[MinValueValidator(1)])
+    amount = models.IntegerField(validators=[MinValueValidator(1)])
 
 
 class HighCard(Game):

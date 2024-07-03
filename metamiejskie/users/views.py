@@ -50,17 +50,16 @@ class MetamiejskieConfirmEmailView(GenericAPIView):
         user = confirmation.email_address.user
         user.is_active = True
         user.save()
-        # return Response("ok")
         return Response({"detail": "Email confirmed"})
 
 
-@extend_schema(tags=["patch notes"])
+@extend_schema(tags=["patch notes"],summary="List of patch notes ordered by date")
 class PatchNotesView(ListModelMixin, GenericViewSet):
     permission_classes = [AllowAny]
     queryset = PatchNotes.objects.order_by("-date")
     serializer_class = PatchNotesSerializer
 
-
+@extend_schema(summary="Default actions to users")
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
     queryset = User.objects.all()
     permission_classes = [IsYouOrReadOnly]
@@ -70,7 +69,7 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
 
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, UserDetailSerializer)
-
+    @extend_schema(summary="Info about current user")
     @action(detail=False)
     def me(self, request):
         serializer = self.get_serializer(request.user, context={"request": request})
