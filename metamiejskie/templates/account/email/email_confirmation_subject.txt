@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}Rozpalony asks you to confirm email address...{% endblocktrans %}
+{% endautoescape %}

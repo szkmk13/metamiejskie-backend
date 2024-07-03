@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block content %}{% autoescape off %}{% user_display user as user_display %}
-Dostajesz tego maila ponieważ KTOŚ próbuje założyć konto na portalu <b>metamiejskie</b> podając taki login: {{ user_display }}
+Dostajesz tego maila ponieważ KTOŚ próbuje założyć konto na portalu metamiejskie podając taki login: {{ user_display }}
 
 Jeżeli to nie byłeś ty SKASUJ TEGO MAILA!
 Poważnie, bezpieczeństwo w sieci to nie przelewki.

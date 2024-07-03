@@ -16,6 +16,9 @@ class AccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request: HttpRequest) -> bool:
         return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
 
+    def format_email_subject(self, subject):
+        return subject
+
     def send_mail(self, template_prefix, email, context):
         ctx = {"email": email}
         ctx.update(context)
