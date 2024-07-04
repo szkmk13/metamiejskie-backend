@@ -31,7 +31,7 @@ class PatchNotes(models.Model):
             else:
                 this_minor += 1
             self.version = f"{this_major}.{this_minor}"
-            return super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
 class VariablesManager(models.Manager):
