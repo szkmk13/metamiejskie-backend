@@ -17,7 +17,6 @@ from metamiejskie.casino.serializers import (
 )
 
 
-# Create your views here.
 @extend_schema(tags=["casino WORK IN PROGRESS"])
 class CardGameViewSet(GenericViewSet):
     queryset = HighCard.objects.all()

@@ -4,18 +4,6 @@ from django.http import HttpResponseRedirect
 from metamiejskie.casino.models import Spin, Game, Symbol, HighCard
 
 
-# @admin.register(HighCard)
-# class CardGameAdmin(admin.ModelAdmin):
-#     list_display = ("name",)
-#     actions = ["play"]
-#
-#     @admin.action()
-#     def play(self, request, queryset):
-#         obj = queryset.first()
-#         obj.play()
-#         return HttpResponseRedirect("/admin/casino/cardgame")
-
-
 @admin.register(Symbol)
 class SymbolAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "image", "weight", "value")
