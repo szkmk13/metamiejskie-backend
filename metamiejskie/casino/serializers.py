@@ -1,7 +1,7 @@
 from rest_framework.serializers import *
 from django.core.validators import MinValueValidator
 
-from metamiejskie.casino.models import Game, Symbol, Spin
+from metamiejskie.casino.models import Game, Symbol, Spin, GAMES
 from metamiejskie.utils import DetailException
 
 
@@ -12,8 +12,6 @@ class SymbolSerializer(ModelSerializer):
 
 
 class GameSerializer(ModelSerializer):
-    symbols = SymbolSerializer(many=True)
-
     class Meta:
         model = Game
         fields = "__all__"
@@ -52,8 +50,8 @@ class HighCardResultSerializer(Serializer):
     bet = CharField(write_only=True)
 
     FACES_VALUES = {"J": 11, "Q": 12, "K": 13, "A": 14}
-    HIGH_LOW_MULTIPLIER = 1.5
-    EQUAL_MULTIPLIER = 7
+    HIGH_LOW_MULTIPLIER = 1.4
+    EQUAL_MULTIPLIER = 6
 
     class Meta:
         fields = "__all__"
@@ -72,7 +70,6 @@ class HighCardResultSerializer(Serializer):
         bet_amount = attrs.get("bet_amount")
         bet = attrs.get("bet")
         user = self.context["user"]
-        print(previous_card_value, next_card_value)
         if user.coins < bet_amount:
             raise DetailException("Insufficient coins")
         user.coins -= bet_amount
@@ -91,7 +88,7 @@ class HighCardResultSerializer(Serializer):
                 user.coins += self.EQUAL_MULTIPLIER * bet_amount
                 attrs["has_won"] = True
                 attrs["reward"] = self.EQUAL_MULTIPLIER * bet_amount
-        spin = Spin(game=self.context["game_object"], user=user, has_won=attrs["has_won"])
+        spin = Spin(game=GAMES.HIGH_CARD, user=user, has_won=attrs["has_won"])
         if attrs["has_won"]:
             spin.amount = attrs["reward"]
         else:

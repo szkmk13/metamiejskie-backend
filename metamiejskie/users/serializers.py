@@ -61,9 +61,9 @@ class DailyQuestStartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DailyQuest
-        fields = ["id", "created_at", "will_end_at", "redeemed", "quest", "time"]
+        fields = ["will_end_at", "quest", "time"]
         write_only_fields = ["quest"]
-        read_only_fields = ["id", "created_at", "will_end_at", "redeemed", "time"]
+        read_only_fields = ["will_end_at", "time"]
 
     def get_time(self, obj) -> int:
         return obj.quest.duration.total_seconds()
@@ -79,25 +79,28 @@ class DailyQuestStartSerializer(serializers.ModelSerializer):
 
 
 class QuestSerializer(serializers.ModelSerializer):
-    can_start = serializers.SerializerMethodField()
-
-    def get_can_start(self, obj) -> bool:
-        user = self.context["request"].user
-        return user.level >= obj.level_required
-
     class Meta:
         model = Quest
-        fields = ["id", "title", "description", "duration", "level_required", "can_start"]
+        fields = ["id", "title", "description", "duration", "level_required"]
+
+
+class DailyQuestRedeemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quest
+        fields = ["coins"]
 
 
 class DailyQuestStatusSerializer(serializers.ModelSerializer):
-    quest = QuestSerializer()
+    quest_id = serializers.SerializerMethodField()
     total_time = serializers.SerializerMethodField()
     remaining_time = serializers.SerializerMethodField()
     finished = serializers.SerializerMethodField()
 
     def get_total_time(self, obj) -> int:
         return int(obj.quest.duration.total_seconds())
+
+    def get_quest_id(self, obj) -> int:
+        return obj.quest.id
 
     def get_remaining_time(self, obj) -> int:
         remaining = (obj.will_end_at - timezone.now()).total_seconds()
@@ -108,10 +111,10 @@ class DailyQuestStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DailyQuest
-        fields = ["id", "quest", "total_time", "remaining_time", "finished"]
+        fields = ["quest_id", "total_time", "remaining_time", "finished", "redeemed", "will_end_at"]
 
 
 class PatchNotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = PatchNotes
-        fields = ["id", "date", "version", "text"]
+        fields = ["id", "date", "title", "version", "text"]

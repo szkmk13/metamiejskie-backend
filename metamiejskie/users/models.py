@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 class PatchNotes(models.Model):
     date = models.DateField(unique=True)
     text = models.TextField(help_text="You can use markdown here")
+    title = models.CharField(max_length=100)
     version = models.CharField(max_length=40, blank=True)
     major = models.BooleanField(default=False)
 
@@ -31,7 +32,7 @@ class PatchNotes(models.Model):
             else:
                 this_minor += 1
             self.version = f"{this_major}.{this_minor}"
-            return super().save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
 
 class VariablesManager(models.Manager):
