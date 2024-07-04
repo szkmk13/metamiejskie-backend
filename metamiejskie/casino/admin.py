@@ -4,16 +4,16 @@ from django.http import HttpResponseRedirect
 from metamiejskie.casino.models import Spin, Game, Symbol, HighCard
 
 
-@admin.register(HighCard)
-class CardGameAdmin(admin.ModelAdmin):
-    list_display = ("name",)
-    actions = ["play"]
-
-    @admin.action()
-    def play(self, request, queryset):
-        obj = queryset.first()
-        obj.play()
-        return HttpResponseRedirect("/admin/casino/cardgame")
+# @admin.register(HighCard)
+# class CardGameAdmin(admin.ModelAdmin):
+#     list_display = ("name",)
+#     actions = ["play"]
+#
+#     @admin.action()
+#     def play(self, request, queryset):
+#         obj = queryset.first()
+#         obj.play()
+#         return HttpResponseRedirect("/admin/casino/cardgame")
 
 
 @admin.register(Symbol)
@@ -26,16 +26,16 @@ class SpinAdmin(admin.ModelAdmin):
     list_display = ("user", "game", "amount")
 
 
-class SpinInline(admin.TabularInline):
-    model = Spin
-    extra = 0
+# class SpinInline(admin.TabularInline):
+#     model = Spin
+#     extra = 0
 
 
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "spins")
     actions = ["play"]
-    inlines = [SpinInline]
+    # inlines = [SpinInline]
 
     @admin.action()
     def run(self, request, queryset):

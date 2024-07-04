@@ -111,7 +111,7 @@ class DailyQuestStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DailyQuest
-        fields = ["quest_id", "total_time", "remaining_time", "finished", "redeemed"]
+        fields = ["quest_id", "total_time", "remaining_time", "finished", "redeemed", "will_end_at"]
 
 
 class PatchNotesSerializer(serializers.ModelSerializer):
