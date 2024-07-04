@@ -12,8 +12,6 @@ class SymbolSerializer(ModelSerializer):
 
 
 class GameSerializer(ModelSerializer):
-    symbols = SymbolSerializer(many=True)
-
     class Meta:
         model = Game
         fields = "__all__"
