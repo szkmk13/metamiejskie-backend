@@ -117,4 +117,4 @@ class DailyQuestStatusSerializer(serializers.ModelSerializer):
 class PatchNotesSerializer(serializers.ModelSerializer):
     class Meta:
         model = PatchNotes
-        fields = ["id", "date", "version", "text"]
+        fields = ["id", "date", "title", "version", "text"]

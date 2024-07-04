@@ -5,6 +5,9 @@ from django.utils.translation import gettext_lazy as _
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
 from .models import User, Quest, DailyQuest, DailyCoins, PatchNotes
+from django.contrib import admin
+from allauth.account import models as allauth_account_models
+from allauth.socialaccount import models as allauth_socialaccount_models
 
 
 @admin.register(PatchNotes)
