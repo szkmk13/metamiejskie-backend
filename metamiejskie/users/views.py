@@ -21,6 +21,7 @@ from metamiejskie.users.serializers import (
     PatchNotesSerializer,
     DailyQuestStatusSerializer,
     UserDetailSerializer,
+    DailyQuestRedeemSerializer,
 )
 
 from django.http import Http404
@@ -120,7 +121,9 @@ class DailyQuestViewSet(GenericViewSet):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @extend_schema(request=None, responses={200: str}, summary="Redeem reward from a daily quest")
+    @extend_schema(
+        request=None, responses={200: DailyQuestRedeemSerializer}, summary="Redeem reward from a daily quest"
+    )
     @action(detail=False, methods=["post"])
     def redeem(self, request):
         if request.user.tokens_redeemed():
@@ -131,8 +134,12 @@ class DailyQuestViewSet(GenericViewSet):
             return Response("No daily quest", status=status.HTTP_400_BAD_REQUEST)
         if qs.filter(will_end_at__gte=now).exists():
             return Response("Quest already started, wait for it to end", status=status.HTTP_400_BAD_REQUEST)
-        request.user.redeem_from_quest(qs.first())
-        return Response(status=status.HTTP_200_OK, data="Rewards redeemed")
+        daily_quest = qs.first()
+        request.user.redeem_from_quest(daily_quest)
+        return Response(
+            data=DailyQuestRedeemSerializer(daily_quest.quest).data,
+            status=status.HTTP_200_OK,
+        )
 
     @extend_schema(request=None, responses={200: DailyQuestStatusSerializer}, summary="Status of a daily quest")
     @action(detail=False, methods=["get"])

@@ -84,6 +84,12 @@ class QuestSerializer(serializers.ModelSerializer):
         fields = ["id", "title", "description", "duration", "level_required"]
 
 
+class DailyQuestRedeemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quest
+        fields = ["coins"]
+
+
 class DailyQuestStatusSerializer(serializers.ModelSerializer):
     quest_id = serializers.SerializerMethodField()
     total_time = serializers.SerializerMethodField()
