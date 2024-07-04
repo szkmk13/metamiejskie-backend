@@ -73,7 +73,7 @@ class CasinoViewSet(ListModelMixin, GenericViewSet):
     def play_high_card(self, request, *args, **kwargs):
         serializer = HighCardPlaySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        game_object, _ = HighCard.objects.get_or_create(user=request.user, name=f"{request.user.id}high card")
+        game_object, _ = HighCard.objects.get_or_create(user=request.user)
         bet_amount = serializer.validated_data["bet_amount"]
         shuffle(self.DECK)
         next_card = self.DECK[0]
