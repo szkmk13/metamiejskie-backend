@@ -21,7 +21,7 @@ class SpinAdmin(admin.ModelAdmin):
 
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "spins")
+    list_display = ("id", "name")
     actions = ["play"]
     # inlines = [SpinInline]
 
