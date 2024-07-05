@@ -35,14 +35,6 @@ class PatchNotes(models.Model):
         return super().save(*args, **kwargs)
 
 
-class VariablesManager(models.Manager):
-    def DAILY_COINS(self):
-        return self.filter(name="DAILY_COINS").first().value
-
-    def by_name(self, name):
-        return self.filter(name=name).first().value
-
-
 class User(AbstractUser):
     """
     Default custom user model for metamiejskie.
@@ -98,7 +90,11 @@ class User(AbstractUser):
 
     @property
     def coins_lost_in_casino(self) -> int:
-        return int(self.spin_set.aggregate(Sum("amount", default=0))["amount__sum"])
+        return int(self.spin_set.filter(has_won=False).aggregate(Sum("amount", default=0))["amount__sum"])
+
+    @property
+    def coins_won_in_casino(self) -> int:
+        return int(self.spin_set.filter(has_won=True).aggregate(Sum("amount", default=0))["amount__sum"])
 
     @property
     def casino_wins(self) -> int:

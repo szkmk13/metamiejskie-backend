@@ -45,8 +45,7 @@ class HighCardResultSerializer(Serializer):
     has_won = BooleanField(default=False)
     reward = IntegerField(default=0)
 
-    lower_multiplier = FloatField(required=False)
-    higher_multiplier = FloatField(required=False)
+    multipliers = ListField(required=False)
 
     next_card_value = CharField(write_only=True)
     previous_card_value = CharField(write_only=True)
