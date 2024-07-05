@@ -11,19 +11,13 @@ class SymbolAdmin(admin.ModelAdmin):
 
 @admin.register(Spin)
 class SpinAdmin(admin.ModelAdmin):
-    list_display = ("user", "game", "amount")
-
-
-# class SpinInline(admin.TabularInline):
-#     model = Spin
-#     extra = 0
+    list_display = ("user", "game", "amount", "has_won")
 
 
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "spins")
+    list_display = ("id", "name")
     actions = ["play"]
-    # inlines = [SpinInline]
 
     @admin.action()
     def run(self, request, queryset):

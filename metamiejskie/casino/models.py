@@ -47,14 +47,10 @@ class Game(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def spins(self):
-        return Spin.objects.filter(game=self.__name__).count()
-
 
 class HighCard(models.Model):
-    last_card = models.CharField(max_length=20, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    last_card = models.CharField(max_length=20, default="")
 
 
 class Roulette(Game):
