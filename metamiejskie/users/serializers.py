@@ -1,5 +1,6 @@
 from allauth.account.models import EmailAddress
 from dj_rest_auth.serializers import PasswordResetSerializer
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, PasswordField
@@ -21,7 +22,7 @@ from metamiejskie.utils import DetailException
 
 class CustomLoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        email = EmailAddress.objects.filter(user__username=attrs["username"]).first()
+        email = EmailAddress.objects.filter(Q(user__username=attrs["username"]) | Q(email=attrs["username"])).first()
         if not email:
             raise DetailException("Email not found")
         if not email.verified:

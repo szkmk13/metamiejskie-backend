@@ -90,7 +90,7 @@ class HighCardResultSerializer(Serializer):
                 attrs["reward"] = self.EQUAL_MULTIPLIER * bet_amount
         spin = Spin(game=GAMES.HIGH_CARD, user=user, has_won=attrs["has_won"])
         if attrs["has_won"]:
-            spin.amount = attrs["reward"]
+            spin.amount = attrs["reward"] - bet_amount
         else:
             spin.amount = bet_amount
         user.save(update_fields=["coins"])

@@ -12,7 +12,7 @@ class SymbolAdmin(admin.ModelAdmin):
 @admin.register(Spin)
 class SpinAdmin(admin.ModelAdmin):
     list_display = ("user", "game", "amount", "has_won")
-    list_filter = ("user","game")
+    list_filter = ("user", "game")
 
 
 @admin.register(Game)
