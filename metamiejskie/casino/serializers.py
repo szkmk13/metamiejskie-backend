@@ -45,6 +45,8 @@ class HighCardResultSerializer(Serializer):
     has_won = BooleanField(default=False)
     reward = IntegerField(default=0)
 
+    multipliers = ListField(required=False)
+
     next_card_value = CharField(write_only=True)
     previous_card_value = CharField(write_only=True)
     bet = CharField(write_only=True)
@@ -55,6 +57,32 @@ class HighCardResultSerializer(Serializer):
 
     class Meta:
         fields = "__all__"
+
+    def to_representation(self, instance):
+        instance = super().to_representation(instance)
+        card_value_string = instance["card_value"]
+        card_value = self.FACES_VALUES.get(card_value_string) if card_value_string.isalpha() else int(card_value_string)
+        instance["multipliers"] = self.calculate_multipliers_based_on_previous_card(card_value)
+        return instance
+
+    def calculate_multipliers_based_on_previous_card(self, card_value) -> (float, float, float):
+        equal = 6
+        if card_value == 8:
+            low = 1.55
+            high = 1.55
+        elif card_value == 2:
+            low = 0
+            high = 1
+        elif card_value == 14:
+            low = 1
+            high = 0
+        elif card_value > 8:
+            low = round(0.1 * -abs(card_value - 8) + 1.55, 2)
+            high = round(0.1 * abs(card_value - 8) + 1.55, 2)
+        else:
+            low = round(0.1 * abs(card_value - 8) + 1.55, 2)
+            high = round(0.1 * -abs(card_value - 8) + 1.55, 2)
+        return low, equal, high
 
     def validate(self, attrs):
         previous_card_value = (
@@ -68,33 +96,35 @@ class HighCardResultSerializer(Serializer):
             else int(attrs["next_card_value"])
         )
         bet_amount = attrs.get("bet_amount")
-        bet = attrs.get("bet")
         user = self.context["user"]
         if user.coins < bet_amount:
             raise DetailException("Insufficient coins")
+        bet = attrs.get("bet")
+        low_multiplier, equal_multiplier, high_multiplier = self.calculate_multipliers_based_on_previous_card(
+            previous_card_value
+        )
+
         user.coins -= bet_amount
         if bet == "high":
             if next_card_value > previous_card_value:
-                user.coins += self.HIGH_LOW_MULTIPLIER * bet_amount
+                user.coins += high_multiplier * bet_amount
                 attrs["has_won"] = True
-                attrs["reward"] = self.HIGH_LOW_MULTIPLIER * bet_amount
+                attrs["reward"] = high_multiplier * bet_amount
         elif bet == "low":
             if next_card_value < previous_card_value:
-                user.coins += self.HIGH_LOW_MULTIPLIER * bet_amount
+                user.coins += low_multiplier * bet_amount
                 attrs["has_won"] = True
-                attrs["reward"] = self.HIGH_LOW_MULTIPLIER * bet_amount
+                attrs["reward"] = low_multiplier * bet_amount
         elif bet == "equal":
             if next_card_value == previous_card_value:
-                user.coins += self.EQUAL_MULTIPLIER * bet_amount
+                user.coins += equal_multiplier * bet_amount
                 attrs["has_won"] = True
-                attrs["reward"] = self.EQUAL_MULTIPLIER * bet_amount
+                attrs["reward"] = equal_multiplier * bet_amount
+
         spin = Spin(game=GAMES.HIGH_CARD, user=user, has_won=attrs["has_won"])
-        if attrs["has_won"]:
-            spin.amount = attrs["reward"] - bet_amount
-        else:
-            spin.amount = bet_amount
-        user.save(update_fields=["coins"])
+        spin.amount = attrs["reward"] - bet_amount if attrs["has_won"] else bet_amount
         spin.save()
+        user.save(update_fields=["coins"])
         return attrs
 
 
@@ -102,7 +132,3 @@ class SpinResultSerializer(Serializer):
     won = BooleanField(read_only=True, default=False)
     amount = IntegerField(read_only=True, default=0)
     result: ListSerializer[SymbolSerializer] = ListSerializer(child=SymbolSerializer(many=True))
-
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        return rep

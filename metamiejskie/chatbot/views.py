@@ -31,6 +31,6 @@ class ChatBotViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         chat_messages = serializer.validated_data["message"]
         client = GroqClient()
-        response = client.get_completion(chat_messages)
+        response = client.get_completion(chat_messages, username=request.user.username)
         chat_messages.append({"role": "assistant", "content": response})
         return Response(chat_messages)

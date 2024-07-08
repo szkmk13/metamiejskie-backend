@@ -46,6 +46,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "level",
             "daily_coins_redeemed",
             "coins_lost_in_casino",
+            "coins_won_in_casino",
             "casino_wins",
             "casino_loses",
         ]
