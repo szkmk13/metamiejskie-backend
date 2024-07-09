@@ -32,8 +32,8 @@ class CardGameViewSet(GenericViewSet):
         return Response(card_game.play())
 
 
-@extend_schema(tags=["casino WORK IN PROGRESS"])
-class CasinoViewSet(ListModelMixin, GenericViewSet):
+@extend_schema(tags=["casino"])
+class CasinoViewSet(GenericViewSet):
     permission_classes = [IsAuthenticated]
     serializer_classes = {"roulette": RouletteSerializer, "high_card": HighCardPlaySerializer}
 
@@ -44,17 +44,13 @@ class CasinoViewSet(ListModelMixin, GenericViewSet):
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, GameSerializer)
 
-    def get_queryset(self):
-        return Game.objects.exclude(name__endswith="high card")
-
-    @extend_schema(summary="Get list of possible games")
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    # def get_queryset(self):
+    #     return Game.objects.exclude(name__endswith="high card")
 
     @extend_schema(
         request=RouletteSerializer,
         responses={200: RouletteResultSerializer},
-        summary="""Place bet of board of roulette""",
+        summary="""Place bet on roulette""",
     )
     @action(methods=["post"], detail=False)
     def roulette(self, request, *args, **kwargs):
@@ -74,7 +70,7 @@ class CasinoViewSet(ListModelMixin, GenericViewSet):
     @extend_schema(
         request=HighCardPlaySerializer,
         responses={200: HighCardResultSerializer},
-        summary="""Place bet if next card will be higher lower or same""",
+        summary="""Place a bet if next card will be higher lower or same""",
     )
     @action(methods=["post"], detail=False)
     def high_card(self, request, *args, **kwargs):

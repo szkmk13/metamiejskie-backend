@@ -93,6 +93,8 @@ class Roulette(Game):
     NUMBER_MULTIPLIER = 36
     COLUMN_AND_DOZEN_MULTIPLIER = 3
     COLOR_MULTIPLIER = 2
+    RED_COLOR = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]
+    BLACK_COLOR = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]
 
     class CHOICES(TextChoices):
         EVEN = "EVEN"
@@ -122,9 +124,9 @@ class Roulette(Game):
         elif bet == self.CHOICES.HALF_LOW:
             return ball_roll <= 18
         elif bet == self.CHOICES.RED:
-            return ball_roll in [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]
+            return ball_roll in self.RED_COLOR
         elif bet == self.CHOICES.BLACK:
-            return ball_roll in [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]
+            return ball_roll in self.BLACK_COLOR
         elif bet == self.CHOICES.FIRST_12:
             return 1 <= ball_roll <= 12
         elif bet == self.CHOICES.SECOND_12:
@@ -167,6 +169,7 @@ class Roulette(Game):
         spin = Spin(game=GAMES.ROULETTE, user=user, amount=bet_amount)
         user_number = user_number or 100
         has_won = self.check_bet(bet=bet, ball_roll=ball_roll, user_number=user_number)
+        win_netto = 0
         if has_won:
             won_amount = bet_amount * self.bet_multiplier(bet=bet)
             user.coins += won_amount
@@ -178,9 +181,9 @@ class Roulette(Game):
         color = "RED"
         if ball_roll == 0:
             color = "GREEN"
-        if ball_roll in [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]:
+        elif ball_roll in self.BLACK_COLOR:
             color = "BLACK"
-        return {"rolled_number": ball_roll, "has_won": has_won, "amount": win_netto if has_won else 0, "color": color}
+        return {"rolled_number": ball_roll, "has_won": has_won, "amount": win_netto, "color": color}
 
 
 class BlackJack(Game):
