@@ -1,23 +1,27 @@
+from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 
 from metamiejskie.users.models import User
 
 
-# Create your models here.
 class Bet(models.Model):
     started_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField(default="bet")
+    text = models.TextField()
     total = models.IntegerField(default=100)
 
-    yes_label = models.CharField(max_length=50, default="yes")
-    no_label = models.CharField(max_length=50, default="no")
+    label_1 = models.CharField(max_length=50, default="TAK")
+    label_2 = models.CharField(max_length=50, default="NIE")
 
-    yes_ratio = models.FloatField(default=2)
-    no_ratio = models.FloatField(default=2)
+    ratio_1 = models.FloatField(default=2)
+    ratio_2 = models.FloatField(default=2)
 
-    open = models.BooleanField(default=True)
     deadline = models.DateTimeField(null=True)
     created_at = models.DateField(auto_now=True)
+
+    @property
+    def is_open(self) -> bool:
+        return self.deadline > timezone.now()
 
     def voted_yes(self, amount):
         """vote impact is calcualted by this equation y=x^0.7"""
@@ -40,21 +44,26 @@ class Bet(models.Model):
 
     @property
     def total_votes(self):
-        return Vote.objects.filter(bet=self).count
+        return self.votes.count()
 
     @property
     def yes_votes(self):
-        return Vote.objects.filter(bet=self).filter(vote="yes").count()
+        return self.votes.filter(vote="yes").count()
 
     @property
     def no_votes(self):
-        return Vote.objects.filter(bet=self).filter(vote="no").count()
+        return self.votes.filter(vote="no").count()
 
 
 class Vote(models.Model):
-    VOTES = (("yes", "yes"), ("no", "no"))
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    bet = models.ForeignKey(Bet, on_delete=models.CASCADE)
-    vote = models.CharField(max_length=3, choices=VOTES, null=True)
-    amount = models.IntegerField()
-    did_win = models.BooleanField(default=False)
+    class Fields(models.TextChoices):
+        a = "a"
+        b = "b"
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="votes")
+    bet = models.ForeignKey(Bet, on_delete=models.CASCADE, related_name="votes")
+    vote = models.CharField(max_length=1)
+
+    amount = models.IntegerField(validators=[MinValueValidator(1)])
+    reward = models.IntegerField(default=0)
+    has_won = models.BooleanField(default=False)
