@@ -13,29 +13,41 @@ from metamiejskie.utils import DetailException
 
 @admin.register(Vote)
 class VoteAdmin(admin.ModelAdmin):
-    list_display = ["user", "bet", "vote", "amount"]
+    list_display = ["user", "bet", "vote", "amount", "has_won"]
 
 
 @admin.register(Bet)
 class BetAdmin(admin.ModelAdmin):
-    list_display = ["text", "label_1", "label_2", "ratio_1", "ratio_2", "deadline"]
+    list_display = ["text", "label_1", "label_2", "ratio_1", "ratio_2", "deadline", "rewards_granted"]
     actions = ["bet_completion"]
+    ordering = [
+        "rewards_granted",
+        "deadline",
+    ]
 
     def calculate(self, request, queryset=None, *args, **kwargs):
         form = BetCompletionForm(request.POST)
         if not form.is_valid():
-            self.message_user(
-                request,
-                "Choose correct",
-                level=messages.ERROR,
-            )
+            self.message_user(request, "Choose correct", level=messages.ERROR)
             return HttpResponseRedirect("/admin/bets/bet")
         bet = Bet.objects.get(id=form.data["bet_id"])
-
-        print(bet)
-
-        path = request.get_full_path()
-        return HttpResponseRedirect(path)
+        winning_answer = "a" if form.data.get("a") else "b"
+        winning_votes = bet.filter_votes_for(winning_answer)
+        losing_votes = bet.exclude_votes_for(winning_answer)
+        for vote in winning_votes:
+            vote.has_won = True
+            vote.reward = 10
+            vote.user.coins += 10
+            vote.save()
+            vote.user.save(update_fields=["coins"])
+        losing_votes.update(has_won=False)
+        # bet.rewards_granted = True
+        bet.save()
+        self.message_user(
+            request,
+            "ok",
+        )
+        return HttpResponseRedirect("/admin/bets/bet")
 
     @admin.action(description="Close bet and payout")
     def bet_completion(self, request, queryset):
@@ -45,6 +57,9 @@ class BetAdmin(admin.ModelAdmin):
         bet = queryset.first()
         if bet.is_open:
             self.message_user(request, "Bet is still going, come back later", level=messages.ERROR)
+            return
+        if bet.rewards_granted:
+            self.message_user(request, "Bet already paid", level=messages.ERROR)
             return
 
         form = BetCompletionForm()
@@ -60,55 +75,6 @@ class BetAdmin(admin.ModelAdmin):
                 "bet": bet,
             },
         )
-        if "send" in request.POST:
-            form = BetCompletionForm(request.POST)
-            if not form.is_valid():
-                self.message_user(
-                    request,
-                    "Choose correct",
-                    level=messages.ERROR,
-                )
-                path = request.get_full_path()
-                path = path.rsplit("/", 2)[0] + "/"
-                return HttpResponseRedirect(path)
-            for bet in form.data["bets"]:
-                bet = Bet.objects.get(id=bet)
-                if bet.open is False:
-                    self.message_user(
-                        request,
-                        "Bet skipped",
-                    )
-                    continue
-
-                total = 0
-                if form.data.get("yes"):
-                    """give payout to players when answer was YES"""
-                    winning_votes = Vote.objects.filter(bet=bet).filter(vote="yes")
-                    losing_votes = Vote.objects.filter(bet=bet).filter(vote="no")
-                    for vote in winning_votes:
-                        total += vote.amount
-                        vote.user.kosa_coins += vote.amount * bet.yes_ratio
-                        vote.user.save()
-                        vote.did_win = True
-                        vote.save()
-                    pass
-                elif form.data.get("no"):
-                    """give payout to players when answer was NO"""
-                    winning_votes = Vote.objects.filter(bet=bet).filter(vote="no")
-                    losing_votes = Vote.objects.filter(bet=bet).filter(vote="yes")
-                    for vote in winning_votes:
-                        total += vote.amount
-                        vote.user.kosa_coins += vote.amount * bet.yes_ratio
-                        vote.user.save()
-                        vote.did_win = True
-                        vote.save()
-                    pass
-                bet.open = False
-                bet.save()
-                self.message_user(
-                    request,
-                    f"payout given",
-                )
 
     def get_urls(self):
         urls = super().get_urls()

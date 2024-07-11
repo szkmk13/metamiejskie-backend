@@ -44,9 +44,6 @@ class CasinoViewSet(GenericViewSet):
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, GameSerializer)
 
-    # def get_queryset(self):
-    #     return Game.objects.exclude(name__endswith="high card")
-
     @extend_schema(
         request=RouletteSerializer,
         responses={200: RouletteResultSerializer},

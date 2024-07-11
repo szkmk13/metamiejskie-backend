@@ -3,6 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework.routers import SimpleRouter
 
+from metamiejskie.bets.views import BetsViewSet
 from metamiejskie.casino.views import CasinoViewSet, CardGameViewSet
 from metamiejskie.chatbot.views import ChatBotViewSet
 from metamiejskie.meetings.views import MeetingViewSet
@@ -15,6 +16,7 @@ router.register("casino", CasinoViewSet, basename="casino")
 router.register("quests", DailyQuestViewSet)
 router.register("chatbot", ChatBotViewSet)
 router.register("meetings", MeetingViewSet)
+router.register("bets", BetsViewSet)
 
 app_name = "api"
 

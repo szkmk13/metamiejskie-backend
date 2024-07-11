@@ -9,7 +9,6 @@ from metamiejskie.bets.models import Bet, Vote
 from metamiejskie.utils import DetailException
 
 
-
 class BetCompletionForm(forms.Form):
     a = forms.BooleanField(required=False)
     b = forms.BooleanField(required=False)
@@ -20,7 +19,7 @@ class BetCompletionForm(forms.Form):
         session = cleaned_data.get("b")
 
         if track and session:
-            self.add_error("a", DetailException("Tak lub nie"))
+            self.add_error("a", DetailException("Choose 1"))
         if not track and not session:
-            self.add_error("a", DetailException("Wybierz"))
+            self.add_error("a", DetailException("Choose 1"))
         return cleaned_data

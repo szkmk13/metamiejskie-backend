@@ -16,8 +16,12 @@ class Bet(models.Model):
     ratio_1 = models.FloatField(default=2)
     ratio_2 = models.FloatField(default=2)
 
-    deadline = models.DateTimeField(null=True)
+    deadline = models.DateTimeField()
     created_at = models.DateField(auto_now=True)
+    rewards_granted = models.BooleanField(default=False)
+
+    def user_has_voted(self, user) -> bool:
+        return self.votes.filter(user=user).exists()
 
     @property
     def is_open(self) -> bool:
@@ -46,13 +50,14 @@ class Bet(models.Model):
     def total_votes(self):
         return self.votes.count()
 
-    @property
-    def yes_votes(self):
-        return self.votes.filter(vote="yes").count()
+    def filter_votes_for(self, value_voting_for):
+        return self.votes.filter(vote=value_voting_for)
 
-    @property
-    def no_votes(self):
-        return self.votes.filter(vote="no").count()
+    def exclude_votes_for(self, value_voting_for):
+        return self.votes.exclude(vote=value_voting_for)
+
+    def __str__(self):
+        return self.text
 
 
 class Vote(models.Model):
@@ -66,4 +71,4 @@ class Vote(models.Model):
 
     amount = models.IntegerField(validators=[MinValueValidator(1)])
     reward = models.IntegerField(default=0)
-    has_won = models.BooleanField(default=False)
+    has_won = models.BooleanField(default=None, null=True)
