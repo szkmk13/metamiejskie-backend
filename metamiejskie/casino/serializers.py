@@ -1,7 +1,7 @@
 from rest_framework.serializers import *
 from django.core.validators import MinValueValidator
 
-from metamiejskie.casino.models import Game, Symbol, Spin, GAMES
+from metamiejskie.casino.models import Game, Symbol, Spin, GAMES, Roulette
 from metamiejskie.utils import DetailException
 
 
@@ -47,8 +47,8 @@ class HighCardResultSerializer(Serializer):
 
     multipliers = ListField(required=False)
 
-    next_card_value = CharField(write_only=True)
-    previous_card_value = CharField(write_only=True)
+    next_card_value = CharField(required=False)
+    previous_card_value = CharField(required=False)
     bet = CharField(write_only=True)
 
     FACES_VALUES = {"J": 11, "Q": 12, "K": 13, "A": 14}
@@ -85,6 +85,8 @@ class HighCardResultSerializer(Serializer):
         return low, equal, high
 
     def validate(self, attrs):
+        if attrs["demo_play"]:
+            return attrs
         previous_card_value = (
             self.FACES_VALUES.get(attrs["previous_card_value"])
             if attrs["previous_card_value"].isalpha()
@@ -132,3 +134,16 @@ class SpinResultSerializer(Serializer):
     won = BooleanField(read_only=True, default=False)
     amount = IntegerField(read_only=True, default=0)
     result: ListSerializer[SymbolSerializer] = ListSerializer(child=SymbolSerializer(many=True))
+
+
+class RouletteSerializer(Serializer):
+    bet_amount = IntegerField(write_only=True, validators=[MinValueValidator(0)])
+    bet = ChoiceField(choices=Roulette.CHOICES)
+    number = IntegerField(write_only=True, required=False)
+
+
+class RouletteResultSerializer(Serializer):
+    has_won = BooleanField(default=False)
+    amount = IntegerField()
+    rolled_number = IntegerField()
+    color = CharField()

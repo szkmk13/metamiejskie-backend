@@ -20,6 +20,7 @@ class Meeting(models.Model):
     users = models.ManyToManyField(User, through="Attendance")
     place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True)
     confirmed_by_majority = models.BooleanField(default=False)
+    description = models.TextField(default="")
 
     pizza = models.BooleanField(default=False)
     casino = models.BooleanField(default=False)

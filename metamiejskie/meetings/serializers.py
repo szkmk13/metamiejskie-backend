@@ -53,7 +53,18 @@ class MeetingAddSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ["id", "participants", "who_drank", "place_name", "date", "place", "users", "pizza", "casino"]
+        fields = [
+            "id",
+            "participants",
+            "description",
+            "who_drank",
+            "place_name",
+            "date",
+            "place",
+            "users",
+            "pizza",
+            "casino",
+        ]
         required_fields = ["place", "participants"]
         read_only_fields = ["users"]
 
@@ -96,7 +107,7 @@ class MeetingDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ["id", "date", "confirmed_by_majority", "place", "casino", "pizza", "users"]
+        fields = ["id", "date", "confirmed_by_majority", "description", "place", "casino", "pizza", "users"]
 
 
 class MeetingListSerializer(MeetingDetailSerializer):

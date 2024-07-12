@@ -22,7 +22,7 @@ class MeetingViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.
     serializer_classes = {
         "retrieve": MeetingDetailSerializer,
         "create": MeetingAddSerializer,
-        "confirmed": MeetingListSerializer,
+        "confirmed": ConfirmMeetingListSerializer,
         "not_confirmed": ConfirmMeetingListSerializer,
         "places": PlaceSerializer,
     }
@@ -38,7 +38,7 @@ class MeetingViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.
 
     @extend_schema(
         summary="List of meetings that are confirmed",
-        responses={200: MeetingListSerializer(many=True)},
+        responses={200: ConfirmMeetingListSerializer(many=True)},
     )
     @action(methods=["get"], detail=False)
     def confirmed(self, request, *args, **kwargs):
