@@ -31,5 +31,7 @@ class BetsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
         bet = self.get_object()
         serializer = self.get_serializer(data=request.data, context={"request": request, "bet": bet})
         serializer.is_valid(raise_exception=True)
+        vote_option = serializer.validated_data["vote"]
+        bet.vote_for(vote_option, serializer.validated_data["amount"])
         vote_object = serializer.save()
-        return Response(VoteSerializer(vote_object).data, status=status.HTTP_201_CREATED)
+        return Response(VoteSerializer(vote_object, context={"request": request}).data, status=status.HTTP_201_CREATED)

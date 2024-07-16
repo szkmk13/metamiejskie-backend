@@ -22,7 +22,7 @@ class MeetingAdmin(admin.ModelAdmin):
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
     list_display = ("user", "meeting", "confirmed")
-    list_filter = ("user",)
+    list_filter = ("user", "confirmed")
 
 
 @admin.register(Place)

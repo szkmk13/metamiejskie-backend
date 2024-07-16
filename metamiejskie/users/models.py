@@ -2,7 +2,7 @@ import math
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import CharField, Sum
+from django.db.models import CharField, Sum, QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -76,7 +76,7 @@ class User(AbstractUser):
         self.points += daily_quest.quest.points
         self.exp += daily_quest.quest.exp
 
-        self.save(update_fields=["coins", "points", "exp"])
+        self.save()
         daily_quest.redeemed = True
         daily_quest.save(update_fields=["redeemed"])
 
@@ -103,6 +103,22 @@ class User(AbstractUser):
     @property
     def casino_loses(self) -> int:
         return self.spin_set.filter(has_won=False).count()
+
+    @property
+    def has_unread_messages(self) -> bool:
+        return self.messages_to.filter(read=False).exists()
+
+    @property
+    def unread_messages(self) -> QuerySet:
+        return self.messages_to.filter(read=False)
+
+
+class Message(models.Model):
+    receiver = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="messages_to")
+    sender = models.ForeignKey(to=User, on_delete=models.CASCADE, related_name="messages_from", null=True, blank=True)
+    message = models.TextField()
+    coins = models.IntegerField(default=100)
+    read = models.BooleanField(default=False)
 
 
 class DailyCoins(models.Model):

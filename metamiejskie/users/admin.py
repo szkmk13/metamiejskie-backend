@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
-from .models import User, Quest, DailyQuest, DailyCoins, PatchNotes
+from .models import User, Quest, DailyQuest, DailyCoins, PatchNotes, Message
 from django.contrib import admin
 from allauth.account import models as allauth_account_models
 from allauth.socialaccount import models as allauth_socialaccount_models
@@ -32,6 +32,12 @@ class DailyQuestAdmin(admin.ModelAdmin):
     list_display = ("user", "quest", "created_at", "will_end_at")
 
 
+@admin.register(Message)
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ("receiver", "sender", "message", "coins", "read")
+    list_filter = ("read", "receiver", "sender")
+
+
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):
     form = UserAdminChangeForm
@@ -56,3 +62,11 @@ class UserAdmin(auth_admin.UserAdmin):
     )
     list_display = ["username", "level", "exp", "points", "coins", "is_active"]
     search_fields = ["name"]
+    actions = [
+        "write_message",
+    ]
+
+    @admin.action()
+    def write_message(self, request, queryset):
+        for user in queryset:
+            Message.objects.create(receiver=user, message="test")

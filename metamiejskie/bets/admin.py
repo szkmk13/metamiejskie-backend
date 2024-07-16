@@ -13,16 +13,25 @@ from metamiejskie.utils import DetailException
 
 @admin.register(Vote)
 class VoteAdmin(admin.ModelAdmin):
-    list_display = ["user", "bet", "vote", "amount", "has_won"]
+    list_display = ["user", "bet", "vote", "amount", "reward", "has_won"]
+    list_filter = ["user", "has_won"]
+
+
+class VoteInline(admin.TabularInline):
+    model = Vote
 
 
 @admin.register(Bet)
 class BetAdmin(admin.ModelAdmin):
     list_display = ["text", "label_1", "label_2", "ratio_1", "ratio_2", "deadline", "rewards_granted"]
+    list_filter = ["rewards_granted"]
     actions = ["bet_completion"]
     ordering = [
         "rewards_granted",
         "deadline",
+    ]
+    inlines = [
+        VoteInline,
     ]
 
     def calculate(self, request, queryset=None, *args, **kwargs):
@@ -32,21 +41,23 @@ class BetAdmin(admin.ModelAdmin):
             return HttpResponseRedirect("/admin/bets/bet")
         bet = Bet.objects.get(id=form.data["bet_id"])
         winning_answer = "a" if form.data.get("a") else "b"
+        winning_ratio = bet.ratio_1 if winning_answer == "a" else bet.ratio_2
+
         winning_votes = bet.filter_votes_for(winning_answer)
         losing_votes = bet.exclude_votes_for(winning_answer)
         for vote in winning_votes:
-            vote.has_won = True
-            vote.reward = 10
-            vote.user.coins += 10
-            vote.save()
+            reward_for_user = vote.amount * winning_ratio
+
+            vote.user.coins += reward_for_user
             vote.user.save(update_fields=["coins"])
+
+            vote.has_won = True
+            vote.reward = reward_for_user - vote.amount
+            vote.save()
         losing_votes.update(has_won=False)
-        # bet.rewards_granted = True
+        bet.rewards_granted = True
         bet.save()
-        self.message_user(
-            request,
-            "ok",
-        )
+        self.message_user(request, "ok")
         return HttpResponseRedirect("/admin/bets/bet")
 
     @admin.action(description="Close bet and payout")
