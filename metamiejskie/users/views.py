@@ -22,6 +22,7 @@ from metamiejskie.users.serializers import (
     DailyQuestStatusSerializer,
     UserDetailSerializer,
     DailyQuestRedeemSerializer,
+    ReadMessageSerializer,
 )
 
 from django.http import Http404
@@ -67,6 +68,8 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
     permission_classes = [IsYouOrReadOnly]
     serializer_classes = {
         "list": UserListSerializer,
+        "read_message": ReadMessageSerializer,
+        # "messages":UserMessagesSerializer,
     }
 
     def get_serializer_class(self):
@@ -87,6 +90,19 @@ class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericV
         DailyCoins.objects.create(user=user)
         user.refresh_from_db()
         return Response(self.get_serializer(user).data, status=status.HTTP_200_OK)
+
+    @extend_schema(summary="Read message and claim rewards", request=ReadMessageSerializer, responses={204: None})
+    @action(detail=False, methods=["post"])
+    def read_message(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = request.user
+        message = serializer.validated_data["id"]
+        user.coins += message.coins
+        message.read = True
+        user.save(update_fields=["coins"])
+        message.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @extend_schema(tags=["daily"])

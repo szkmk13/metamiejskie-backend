@@ -30,6 +30,7 @@ class BetsListSerializer(serializers.ModelSerializer):
             "label_2",
             "ratio_1",
             "ratio_2",
+            "total",
             "created_at",
             "deadline",
             "rewards_granted",
@@ -37,6 +38,8 @@ class BetsListSerializer(serializers.ModelSerializer):
 
 
 class VoteSerializer(serializers.ModelSerializer):
+    bet = BetsListSerializer(read_only=True)
+
     class Meta:
         model = Vote
         fields = "__all__"
@@ -64,7 +67,15 @@ class BetVoteSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         attrs["user"] = self.context["request"].user
         attrs["bet"] = self.context["bet"]
+        if attrs["amount"] > self.context["request"].user.coins:
+            raise DetailException("Not enough coins")
         if self.context["bet"].user_has_voted(attrs["user"]):
             raise DetailException("Already voted")
         attrs = super().validate(attrs)
         return attrs
+
+    def create(self, validated_data):
+        user = validated_data["user"]
+        user.coins -= validated_data["amount"]
+        user.save(update_fields=["coins"])
+        return super().create(validated_data)

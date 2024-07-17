@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, serializers
 from rest_framework_simplejwt.settings import api_settings
 
-from metamiejskie.users.models import User, DailyQuest, Quest, PatchNotes
+from metamiejskie.users.models import User, DailyQuest, Quest, PatchNotes, Message
 
 from django.conf import settings
 
@@ -36,7 +36,27 @@ class UserListSerializer(serializers.ModelSerializer[User]):
         fields = ["id", "username", "points"]
 
 
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = "__all__"
+
+
+class ReadMessageSerializer(serializers.Serializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=Message.objects.all())
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if attrs["id"].receiver != self.context["request"].user:
+            raise DetailException("This message wasn't to you")
+        if attrs["id"].read:
+            raise DetailException("Message already read")
+        return attrs
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
+    unread_messages = MessageSerializer(many=True, read_only=True)
+
     class Meta:
         model = User
         fields = UserListSerializer.Meta.fields + [
@@ -49,6 +69,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "coins_won_in_casino",
             "casino_wins",
             "casino_loses",
+            "has_unread_messages",
+            "unread_messages",
+            "date_joined"
         ]
 
 
