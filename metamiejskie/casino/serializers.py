@@ -146,4 +146,5 @@ class RouletteResultSerializer(Serializer):
     has_won = BooleanField(default=False)
     amount = IntegerField()
     rolled_number = IntegerField()
+    rolled_number_index = IntegerField()
     color = CharField()

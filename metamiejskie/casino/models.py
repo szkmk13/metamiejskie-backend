@@ -163,18 +163,57 @@ class Roulette(Game):
         ]:
             return self.COLUMN_AND_DOZEN_MULTIPLIER
 
+    VALUE_TO_FRONTEND_INDEX = {
+        0: 0,
+        32: 1,
+        15: 2,
+        19: 3,
+        4: 4,
+        21: 5,
+        2: 6,
+        25: 7,
+        17: 8,
+        34: 9,
+        6: 10,
+        27: 11,
+        13: 12,
+        36: 13,
+        11: 14,
+        30: 15,
+        8: 16,
+        23: 17,
+        10: 18,
+        5: 19,
+        24: 20,
+        16: 21,
+        33: 22,
+        1: 23,
+        20: 24,
+        14: 25,
+        31: 26,
+        9: 27,
+        22: 28,
+        18: 29,
+        29: 30,
+        7: 31,
+        28: 32,
+        12: 33,
+        35: 34,
+        3: 35,
+        26: 36,
+    }
+
     def play(self, user, bet, bet_amount, user_number, *args, **kwargs):
         ball_roll = random.randint(0, 36)
         user.coins -= bet_amount
         spin = Spin(game=GAMES.ROULETTE, user=user, amount=bet_amount)
         user_number = user_number or 100
         has_won = self.check_bet(bet=bet, ball_roll=ball_roll, user_number=user_number)
-        win_netto = 0
+        won_amount = 0
         if has_won:
             won_amount = bet_amount * self.bet_multiplier(bet=bet)
             user.coins += won_amount
-            win_netto = won_amount - bet_amount
-            spin.amount = win_netto
+            spin.amount = won_amount - bet_amount
             spin.has_won = True
         spin.save()
         user.save()
@@ -183,7 +222,13 @@ class Roulette(Game):
             color = "GREEN"
         elif ball_roll in self.BLACK_COLOR:
             color = "BLACK"
-        return {"rolled_number": ball_roll, "has_won": has_won, "amount": win_netto, "color": color}
+        return {
+            "rolled_number": ball_roll,
+            "rolled_number_index": self.VALUE_TO_FRONTEND_INDEX[ball_roll],
+            "has_won": has_won,
+            "amount": won_amount,
+            "color": color,
+        }
 
 
 class BlackJack(Game):

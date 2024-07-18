@@ -44,11 +44,11 @@ class Bet(models.Model):
         self.save()
 
     @property
-    def total(self):
+    def total(self) -> int:
         return int(self.votes.aggregate(Sum("amount", default=0))["amount__sum"])
 
     @property
-    def total_votes(self):
+    def total_votes(self) -> int:
         return self.votes.count()
 
     def filter_votes_for(self, value_voting_for):
