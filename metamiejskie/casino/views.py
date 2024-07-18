@@ -51,7 +51,7 @@ class CasinoViewSet(GenericViewSet):
     )
     @action(methods=["post"], detail=False)
     def roulette(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data, context={"request": request, "user": request.user})
         serializer.is_valid(raise_exception=True)
         user_number = serializer.validated_data.get("number")
         roulette = Roulette()

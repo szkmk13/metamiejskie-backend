@@ -71,7 +71,8 @@ class UserDetailSerializer(serializers.ModelSerializer):
             "casino_loses",
             "has_unread_messages",
             "unread_messages",
-            "date_joined"
+            "date_joined",
+            "description",
         ]
 
 

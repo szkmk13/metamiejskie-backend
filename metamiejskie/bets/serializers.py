@@ -34,6 +34,7 @@ class BetsListSerializer(serializers.ModelSerializer):
             "created_at",
             "deadline",
             "rewards_granted",
+            "is_open",
         ]
 
 
@@ -71,6 +72,10 @@ class BetVoteSerializer(serializers.ModelSerializer):
             raise DetailException("Not enough coins")
         if self.context["bet"].user_has_voted(attrs["user"]):
             raise DetailException("Already voted")
+        if self.context["bet"].rewards_granted:
+            raise DetailException("Rewards already granted")
+        if not self.context["bet"].is_open:
+            raise DetailException("Bet already closed, wait for rewards to be granted")
         attrs = super().validate(attrs)
         return attrs
 

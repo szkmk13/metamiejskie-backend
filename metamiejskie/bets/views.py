@@ -13,7 +13,7 @@ from metamiejskie.meetings.models import Meeting, Place, Attendance
 
 @extend_schema(summary="Bets view", tags=["bets"])
 class BetsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin):
-    queryset = Bet.objects.order_by("-deadline")
+    queryset = Bet.objects.filter(rewards_granted=False).order_by("-deadline")
     serializer_classes = {
         "vote": BetVoteSerializer,
         "create": CreateBetSerializer,

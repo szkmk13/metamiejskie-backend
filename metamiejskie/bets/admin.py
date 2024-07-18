@@ -58,7 +58,7 @@ class BetAdmin(admin.ModelAdmin):
         bet.rewards_granted = True
         bet.save()
         self.message_user(request, "ok")
-        return HttpResponseRedirect("/admin/bets/bet")
+        return HttpResponseRedirect(request.build_absolute_uri().split("/calculate")[0])
 
     @admin.action(description="Close bet and payout")
     def bet_completion(self, request, queryset):
