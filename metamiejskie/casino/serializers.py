@@ -141,6 +141,14 @@ class RouletteSerializer(Serializer):
     bet = ChoiceField(choices=Roulette.CHOICES)
     number = IntegerField(write_only=True, required=False)
 
+    def validate(self, attrs):
+        if attrs.get("number") and attrs["bet"] != Roulette.CHOICES.NUMBER:
+            raise DetailException("Chose number as bet")
+        user = self.context["request"].user
+        if attrs["bet_amount"] > user.coins:
+            raise DetailException("Insufficient coins")
+        return super().validate(attrs)
+
 
 class RouletteResultSerializer(Serializer):
     has_won = BooleanField(default=False)
